@@ -1,0 +1,258 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    width: 100%;
+    max-width: 1920px;
+    height: 100%;
+    font-family: 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 11pt;
+}
+
+h4, p {
+    padding: 5px;
+    line-height: 1.5em;
+}
+
+h1, h4 {
+    align-self: center;
+    position: relative;
+    cursor: default;
+    user-select: none;
+    z-index: 1;
+}
+
+.Title {
+    background: url('img/distressed_texture_in_purple_background.jpg') fixed, #bfe8ff;
+    mix-blend-mode: darken;
+    padding: 5px;
+    text-align: center;
+    color: #e7820e;
+    border-bottom: 2px solid #71aaca;
+}
+
+.FlexMain {
+    min-height: calc(100% - 46px);
+    width: 100%;
+    background: url('img/messy-wall-stucco-texture-background.jpg');
+    background-size: cover;
+    display: flex;
+    flex-direction: row;
+    overflow-y: hidden;
+    overflow-x: overlay;
+
+}
+
+.FlexArea {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 30px 0;
+}
+
+.Flex1 {
+    flex-direction: column;
+    flex: 11;
+}
+
+.Flex1 > h4 {
+    opacity: 0;
+}
+
+.Flex2 {
+    flex-direction: column;
+    flex: 6;
+}
+
+.Flex3 {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    flex: 7;
+}
+
+.Flex3-1 {
+    display: flex;
+    flex-direction: column;
+    flex: 3;
+}
+
+.Flex3-1-1 {
+    padding-bottom: 0;
+    flex-direction: column;
+    flex: 1;
+}
+
+.Flex3-1-2 {
+    flex: 1;
+}
+
+.Flex3-2 {
+    flex: 1;
+}
+
+#ElementsContainer {
+    margin-top: 6px;
+    background: linear-gradient(to top right, #c2d1ff, 
+        hsla(184, 100%, 92%, 0.95), hsla(113, 100%, 97%, 0.8));
+    border: 3px solid #a02f0d;
+    border-radius: 3%;
+}
+
+.Element {
+    display: inline-block;
+    text-align: center;
+    border: 1px solid #0524d4;
+    box-sizing: border-box;
+    cursor: pointer;
+    transition: 100ms ease;
+    z-index: 1;
+    opacity: 1;
+    user-select: none;
+}
+
+.Element:not([disabled]):hover {
+    transform: translate(3px, 3px) !important;
+}
+
+.TextInfo {
+    margin-top: 6px;
+    width: 100%;
+    max-width: 412px;
+    min-width: 300px;
+    height: 100%;
+    padding: 5px;
+    font-family: Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 10pt;
+    resize: none;
+    overflow: auto;
+    scroll-behavior: smoothpx;
+    box-sizing: border-box;
+    border: 1px solid #71aaca;
+}
+
+.TextInfo:focus {
+    outline: 0;
+}
+
+.TextInfo::selection {
+    color: rgb(132, 247, 255);
+    background: rgb(0, 13, 133);
+}
+
+.Table-ContSizes {
+    position: relative;
+    margin: 10px 3px 20px;
+    border-collapse: collapse;
+    user-select: none;
+    z-index: 1;
+}
+
+.Table-ContSizes td {
+    padding: 5px;
+}
+
+.Table-ContSizes .Size {
+    border-bottom: 1px solid #71aaca;
+    border-right: 1px solid #71aaca;
+}
+
+.Table-ContSizes input[name="ContainerSize"], .Table-ContSizes label {
+    cursor: pointer;
+}
+
+.Table-ContSizes .Description {
+    padding-right: 5px;
+    cursor: default;
+    border-bottom: 1px solid #71aaca;
+}
+
+.Table-ContSizes .Description > img {
+    height: 260px;
+    vertical-align: middle;
+    filter: invert(10%);
+}
+
+.Table-ContSizes .EmptyRow {
+    border-left: 1px solid #71aaca;
+    width: 0;
+}
+
+.Table-ContSizes .TDBackground {
+    position: relative;
+}
+
+.ParametersList {
+    position: relative;
+    margin: 3px;
+    min-width: 276px;
+    list-style-type: none;
+    z-index: 1;
+}
+
+.ParamListLine {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 5px;
+    border-right: 1px solid #71aaca;
+    border-bottom: 1px solid #71aaca;
+}
+
+.ParamListLine label {
+    padding-right: 10px;
+    vertical-align: middle;
+    user-select: none;
+}
+
+.ParamListLine input[type="number"] {
+    width: 40px;
+    margin-right: 52px;
+    padding: 2px;
+}
+
+.ParamListLine input[type="range"] {
+    width: 100px;
+    vertical-align: middle;
+}
+
+.Table-ContSizes .TDBackground::before, .ParametersList::before, .H4Background::before {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; top: 0; bottom: 0;
+    z-index: -1;
+    background: rgba(255, 255, 255, 0.8);
+    margin: -3px;
+}
+
+.ClickingObject {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    position: relative;
+    height: 100px;
+    width: 250px;
+    color:#315366;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 16pt;
+    border-radius: 8px;
+    user-select: none;
+}
+
+.ClickingObject:not([disabled]):active {
+    background-color: #ffec44 !important;
+}
+
+.ClickingObject > p {
+    padding: 2px;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
+    text-align: center;
+}
+
+#ClickInfo {
+    font-size: 14pt;
+    opacity: 0.5;
+}

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Scattered Elements</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <div class="Title">
+            <h1>Scatterred Elements / Разбрасывание элементов</h1>
+        </div>
+        <div class="FlexMain">
+            <div class="FlexArea Flex1">
+                <h4>Container</h4>
+                <div id="ElementsContainer"></div>
+            </div>
+            <div class="FlexArea Flex2">
+                <h4 class="H4Background">Инфополе:</h4>
+                <textarea class="TextInfo" tabindex="-1" readonly></textarea>
+            </div>
+            <div class="Flex3">
+                <div class="Flex3-1">
+                    <div class="FlexArea Flex3-1-1">
+                        <h4 class="H4Background">Настраиваемые параметры:</h4>
+                        <table class="Table-ContSizes">
+                            <tr>
+                                <td class="Description TDBackground" rowspan="10">Размеры контейнера: <img src="img/open_brace.png" alt="Open Brace"></td>
+                                <td class="Size TDBackground">
+                                    <label><input name="ContainerSize" type="radio" value="1"> 1 x 1</label>
+                                </td>
+                                
+                            </tr>
+                            <tr>
+                                <td class="Size TDBackground">
+                                    <label><input name="ContainerSize" type="radio" value="2"> 2 x 2</label>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="Size TDBackground">
+                                    <label><input name="ContainerSize" type="radio" value="3"> 3 x 3</label>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="Size TDBackground">
+                                    <label><input name="ContainerSize" type="radio" value="4"> 4 x 4</label>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="Size TDBackground">
+                                    <label><input name="ContainerSize" type="radio" value="5" checked> 5 x 5</label>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="Size TDBackground">
+                                    <label><input name="ContainerSize" type="radio" value="6"> 6 x 6</label>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="Size TDBackground">
+                                    <label><input name="ContainerSize" type="radio" value="7"> 7 x 7</label>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="Size TDBackground">
+                                    <label><input name="ContainerSize" type="radio" value="8"> 8 x 8</label>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="Size TDBackground">
+                                    <label><input name="ContainerSize" type="radio" value="9"> 9 x 9</label>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="Size TDBackground">
+                                    <label><input name="ContainerSize" type="radio" value="10"> 10 x 10</label>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="FlexArea Flex3-1-2">
+                        <ul class="ParametersList">
+                            <li class="ParamListLine">
+                                <label for="ScatterGroup">Кол-во выбрасываемых элементов, <i>шт. (1 - 100)</i>:</label>
+                                <input id="ScatterGroup" type="number" value="5" min="1" max="100">
+                            </li>
+                            <li class="ParamListLine">
+                                <label for="MaxScatterLength">Макс. длина разброса L, <i>пкс (100 - 1000)</i>:</label>
+                                <input id="MaxScatterLength" type="range" value="500" min="100" max="1000">
+                            </li>
+                            <li class="ParamListLine">
+                                <label for="SpeedScatter">Скорость выброса (для макс. L), <i>пкс/с (0.2L - 5L)</i>:</label>
+                                <input id="SpeedScatter" type="range" value="2000" min="200" max="5000">
+                            </li>
+                            <li class="ParamListLine">
+                                <label for="MaxTimeStart">Макс. задержка разлёта (для элем. > 1), <i>мс (0 - 2000)</i>:</label>
+                                <input id="MaxTimeStart" type="range" value="350" min="0" max="2000">
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="FlexArea Flex3-2">
+                    <div class="ClickingObject" tabindex="0">
+                        <p><b>Разбросать элементы!</b></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script src="script.js" type="module"></script>
+    </body>
+</html>
