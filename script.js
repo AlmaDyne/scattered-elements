@@ -167,7 +167,7 @@ function cleanContainer(options) {
         Promise.all(elemArray.map((elem, idx) => new Promise(resolve => {
             const timeRandomStart = (idx === fastElemIdx) ? 0 : Math.ceil(Math.random() * maxTimeRandomStart);
 
-            setTimeout(() => {
+            timersRandomStartsArray[idx] = setTimeout(() => {
                 elem.style.transition = timeElemScatter + 'ms ease';
                 elem.style.transform = 'translate(0, 0) rotate(0deg) scale(1)';
                 elem.style.opacity = 1;
