@@ -36,13 +36,11 @@ h1, h4 {
 .FlexMain {
     min-height: calc(100% - 46px);
     width: 100%;
-    background: url('img/messy-wall-stucco-texture-background.jpg');
-    background-size: cover;
+    background: url('img/messy-wall-stucco-texture-background.jpg') fixed;
     display: flex;
     flex-direction: row;
     overflow-y: hidden;
     overflow-x: overlay;
-
 }
 
 .FlexArea {
@@ -99,6 +97,7 @@ h1, h4 {
         hsla(184, 100%, 92%, 0.95), hsla(113, 100%, 97%, 0.8));
     border: 3px solid #a02f0d;
     border-radius: 3%;
+    backdrop-filter: blur(1.2px);
 }
 
 .Element {
@@ -223,8 +222,9 @@ h1, h4 {
     position: absolute;
     left: 0; right: 0; top: 0; bottom: 0;
     z-index: -1;
-    background: rgba(255, 255, 255, 0.8);
     margin: -3px;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(1.2px);
 }
 
 .ClickingObject {

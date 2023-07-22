@@ -181,6 +181,7 @@ function cleanContainer(options) {
                 shuffle(indexes);
 
                 scatterElemAmount = 0;
+                addTimeWait = 0;
                 clickCountPermission = true;
                 
                 scatterButton.removeAttribute('disabled');
@@ -205,7 +206,6 @@ function initialContainer() {
     fillContPermission = false;
     elemArray = [].slice.call(document.querySelectorAll('.Element'));
     scatterElemAmount = 0;
-    timeOnClick = 0;
     addTimeWait = 0;
     indexes.length = 0;
 
