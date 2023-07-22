@@ -7,6 +7,7 @@ const elemContainer = document.getElementById('ElementsContainer');
 const infoArea = document.querySelector('.TextInfo');
 let timerWarn = null,
     timerWait = null,
+    timersRandomStartsArray = [],
     iClick = 0,
     indexes = [],
     elemArray,
@@ -21,9 +22,13 @@ scatterButton.insertAdjacentHTML('beforeend', '<p id="ClickInfo">(Не нажа�
 initialContainer();
 
 for (let radioButton of document.querySelectorAll('input[name="ContainerSize"]')) {
-    radioButton.addEventListener('click', () => {
+    radioButton.addEventListener('click', () => {     
+        for (let timer of timersRandomStartsArray) {
+            clearTimeout(timer);
+        }
+        
         clearTimeout(timerWait);
-
+        
         elemContainer.innerHTML = '';
 
         initialContainer();
@@ -89,6 +94,7 @@ function cleanContainer(options) {
         const timeRandomStartArray = [];
 
         if (scatterElemAmount === 0) timeOnClick = Date.now();
+
         // От предыдущего максимума добавочного времени отнимаем разницу между кликами
         addTimeWait -= Date.now() - timeOnClick;
         timeOnClick = Date.now();
@@ -97,7 +103,7 @@ function cleanContainer(options) {
             const timeRandomStart = (i === fastElemIdx) ? 0 : Math.ceil(Math.random() * maxTimeRandomStart);
             timeRandomStartArray.push(timeRandomStart);
 
-            setTimeout(() => {
+            timersRandomStartsArray[i] = setTimeout(() => {
                 const x = randomInteger(-scatterLength, scatterLength),
                     y = randomInteger(-scatterLength, scatterLength),
                     z = randomNumber(0.3, 2);
@@ -112,7 +118,7 @@ function cleanContainer(options) {
         }
 
         addTimeWait = Math.max(addTimeWait, ...timeRandomStartArray);
-        
+
         scatterElemAmount += elemInGroup;
 
         if (scatterElemAmount >= elemArray.length) {
@@ -182,6 +188,7 @@ function cleanContainer(options) {
 
                 scatterElemAmount = 0;
                 addTimeWait = 0;
+                timersRandomStartsArray.length = 0;
                 clickCountPermission = true;
                 
                 scatterButton.removeAttribute('disabled');
@@ -207,6 +214,7 @@ function initialContainer() {
     elemArray = [].slice.call(document.querySelectorAll('.Element'));
     scatterElemAmount = 0;
     addTimeWait = 0;
+    timersRandomStartsArray.length = 0;
     indexes.length = 0;
 
     for (let i = 0; i < elemArray.length; i++) {
