@@ -43,7 +43,7 @@ scatterButton.addEventListener('click', () => {
 
     const ScatterGroup = document.getElementById('ScatterGroup');
     const MaxScatterLength = document.getElementById('MaxScatterLength');
-    const SpeedScatter = document.getElementById('SpeedScatter');
+    const TimeScatter = document.getElementById('TimeScatter');
     const MaxTimeStart = document.getElementById('MaxTimeStart');
 
     if (ScatterGroup.value < 1 || ScatterGroup.value > 100 || isNaN(ScatterGroup.value)) {
@@ -56,7 +56,7 @@ scatterButton.addEventListener('click', () => {
     } else {
         cleanContainer({
             elemInGroup: +ScatterGroup.value,
-            timeElemScatter: +SpeedScatter.value,
+            timeElemScatter: TimeScatter.value ** 2 / 50,
             maxTimeRandomStart: +MaxTimeStart.value,
             scatterLength: +MaxScatterLength.value
         });
@@ -83,6 +83,8 @@ function cleanContainer(options) {
     }, options);
 
     let {timeElemHover, timeElemScatter, maxTimeRandomStart, elemInGroup, scatterLength} = parameters;
+
+    console.log(timeElemScatter);
 
     if (scatterElemAmount !== elemArray.length) {
         const lastIdxInGroup = (scatterElemAmount + elemInGroup <= elemArray.length) ?
@@ -132,7 +134,7 @@ function cleanContainer(options) {
             scatterButton.style.cursor = 'not-allowed';
             scatterButton.children[0].innerHTML = '<b>...Ожидание...</b>';
 
-            infoArea.innerHTML += 'Выброшено элементов: ' + scatterElemAmount + ' (контейнер пуст)' + '\n\n';
+            infoArea.innerHTML += 'Выброшено элементов: ' + scatterElemAmount + ' (все)' + '\n\n';
             infoArea.scrollTop = infoArea.scrollHeight;
 
             new Promise(resolve => timerWait = setTimeout(resolve, timeElemScatter + addTimeWait))
@@ -145,6 +147,9 @@ function cleanContainer(options) {
                     scatterButton.style.border = '1px solid #71aaca';
                     scatterButton.style.cursor = 'pointer';
                     scatterButton.children[0].innerHTML = '<b>Заполнить контейнер</b>';
+
+                    infoArea.innerHTML += 'Контейнер пуст.' + '\n\n';
+                    infoArea.scrollTop = infoArea.scrollHeight;
                 });
         } else {
             infoArea.innerHTML += 'Выброшено элементов: ' + scatterElemAmount + '\n';
