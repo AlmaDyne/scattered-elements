@@ -56,9 +56,9 @@ scatterButton.addEventListener('click', () => {
     } else {
         cleanContainer({
             elemInGroup: +ScatterGroup.value,
-            scatterLength: +MaxScatterLength.value,
-            timeElemScatter: (1000 / +SpeedScatter.value) * 1000,
-            maxTimeRandomStart: +MaxTimeStart.value
+            timeElemScatter: +SpeedScatter.value,
+            maxTimeRandomStart: +MaxTimeStart.value,
+            scatterLength: +MaxScatterLength.value
         });
     }
 });
@@ -106,12 +106,13 @@ function cleanContainer(options) {
             timersRandomStartsArray[i] = setTimeout(() => {
                 const x = randomInteger(-scatterLength, scatterLength),
                     y = randomInteger(-scatterLength, scatterLength),
-                    z = randomNumber(0.3, 2);
+                    z = randomNumber(0.3, 2),
+                    g = shuffle([-1, 1])[0] * 360;
                 
                 elemArray[indexes[i] - 1].setAttribute('disabled', '');
                 elemArray[indexes[i] - 1].style.cursor = 'default';
                 elemArray[indexes[i] - 1].style.transition = timeElemScatter + 'ms ease-in-out';
-                elemArray[indexes[i] - 1].style.transform = `translate(${x}px, ${y}px) rotate(360deg) scale(${z})`;
+                elemArray[indexes[i] - 1].style.transform = `translate(${x}px, ${y}px) rotate(${g}deg) scale(${z})`;
                 elemArray[indexes[i] - 1].style.opacity = 0;
                 elemArray[indexes[i] - 1].style.visibility = "hidden";
             }, timeRandomStart);

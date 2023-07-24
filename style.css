@@ -97,7 +97,7 @@ h1, h4 {
         hsla(184, 100%, 92%, 0.95), hsla(113, 100%, 97%, 0.8));
     border: 3px solid #a02f0d;
     border-radius: 3%;
-    backdrop-filter: blur(1.2px);
+    backdrop-filter: blur(1.25px);
 }
 
 .Element {
@@ -144,6 +144,8 @@ h1, h4 {
 .Table-ContSizes {
     position: relative;
     margin: 10px 3px 20px;
+    border-right: 1px solid #71aaca;
+    border-bottom: 1px solid #71aaca;
     border-collapse: collapse;
     user-select: none;
     z-index: 1;
@@ -155,17 +157,10 @@ h1, h4 {
 
 .Table-ContSizes .Size {
     border-bottom: 1px solid #71aaca;
-    border-right: 1px solid #71aaca;
-}
-
-.Table-ContSizes input[name="ContainerSize"], .Table-ContSizes label {
-    cursor: pointer;
 }
 
 .Table-ContSizes .Description {
-    padding-right: 5px;
     cursor: default;
-    border-bottom: 1px solid #71aaca;
 }
 
 .Table-ContSizes .Description > img {
@@ -174,13 +169,8 @@ h1, h4 {
     filter: invert(10%);
 }
 
-.Table-ContSizes .EmptyRow {
-    border-left: 1px solid #71aaca;
-    width: 0;
-}
-
-.Table-ContSizes .TDBackground {
-    position: relative;
+.Table-ContSizes input[name="ContainerSize"], .Table-ContSizes label {
+    cursor: pointer;
 }
 
 .ParametersList {
@@ -217,14 +207,14 @@ h1, h4 {
     vertical-align: middle;
 }
 
-.Table-ContSizes .TDBackground::before, .ParametersList::before, .H4Background::before {
+.Table-ContSizes::before, .ParametersList::before, .H4Background::before {
     content: '';
     position: absolute;
     left: 0; right: 0; top: 0; bottom: 0;
     z-index: -1;
     margin: -3px;
     background: rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(1.2px);
+    backdrop-filter: blur(1.25px);
 }
 
 .ClickingObject {

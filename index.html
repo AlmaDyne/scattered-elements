@@ -24,54 +24,53 @@
                         <h4 class="H4Background">Настраиваемые параметры:</h4>
                         <table class="Table-ContSizes">
                             <tr>
-                                <td class="Description TDBackground" rowspan="10">Размеры контейнера: <img src="img/open_brace.png" alt="Open Brace"></td>
-                                <td class="Size TDBackground">
+                                <td class="Description" rowspan="10">Размеры контейнера: <img src="img/open_brace.png" alt="Open Brace"></td>
+                                <td class="Size">
                                     <label><input name="ContainerSize" type="radio" value="1"> 1 x 1</label>
                                 </td>
-                                
                             </tr>
                             <tr>
-                                <td class="Size TDBackground">
+                                <td class="Size">
                                     <label><input name="ContainerSize" type="radio" value="2"> 2 x 2</label>
                                 </td>
                             </tr>
                             <tr>
-                                <td class="Size TDBackground">
+                                <td class="Size">
                                     <label><input name="ContainerSize" type="radio" value="3"> 3 x 3</label>
                                 </td>
                             </tr>
                             <tr>
-                                <td class="Size TDBackground">
+                                <td class="Size">
                                     <label><input name="ContainerSize" type="radio" value="4"> 4 x 4</label>
                                 </td>
                             </tr>
                             <tr>
-                                <td class="Size TDBackground">
+                                <td class="Size">
                                     <label><input name="ContainerSize" type="radio" value="5" checked> 5 x 5</label>
                                 </td>
                             </tr>
                             <tr>
-                                <td class="Size TDBackground">
+                                <td class="Size">
                                     <label><input name="ContainerSize" type="radio" value="6"> 6 x 6</label>
                                 </td>
                             </tr>
                             <tr>
-                                <td class="Size TDBackground">
+                                <td class="Size">
                                     <label><input name="ContainerSize" type="radio" value="7"> 7 x 7</label>
                                 </td>
                             </tr>
                             <tr>
-                                <td class="Size TDBackground">
+                                <td class="Size">
                                     <label><input name="ContainerSize" type="radio" value="8"> 8 x 8</label>
                                 </td>
                             </tr>
                             <tr>
-                                <td class="Size TDBackground">
+                                <td class="Size">
                                     <label><input name="ContainerSize" type="radio" value="9"> 9 x 9</label>
                                 </td>
                             </tr>
                             <tr>
-                                <td class="Size TDBackground">
+                                <td class="Size">
                                     <label><input name="ContainerSize" type="radio" value="10"> 10 x 10</label>
                                 </td>
                             </tr>
@@ -84,16 +83,16 @@
                                 <input id="ScatterGroup" type="number" value="5" min="1" max="100">
                             </li>
                             <li class="ParamListLine">
-                                <label for="MaxScatterLength">Макс. длина разброса (L), <i>пкс (0 - 1000)</i>:</label>
-                                <input id="MaxScatterLength" type="range" value="500" min="0" max="1000">
-                            </li>
-                            <li class="ParamListLine">
-                                <label for="SpeedScatter">Скорость выброса (для макс. длины L), <i>пкс/с (0.2L - 5L)</i>:</label>
-                                <input id="SpeedScatter" type="range" value="2000" min="200" max="5000">
+                                <label for="SpeedScatter">Время выброса (без учёта задержки), <i>мс (200 - 2500)</i>:</label>
+                                <input id="SpeedScatter" type="range" value="500" min="200" max="2500">
                             </li>
                             <li class="ParamListLine">
                                 <label for="MaxTimeStart">Макс. задержка разлёта (для элем. > 1), <i>мс (0 - 2000)</i>:</label>
                                 <input id="MaxTimeStart" type="range" value="350" min="0" max="2000">
+                            </li>
+                            <li class="ParamListLine">
+                                <label for="MaxScatterLength">Макс. длина разброса, <i>пкс (0 - 1000)</i>:</label>
+                                <input id="MaxScatterLength" type="range" value="500" min="0" max="1000">
                             </li>
                         </ul>
                     </div>
