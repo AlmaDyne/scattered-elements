@@ -56,7 +56,7 @@ scatterButton.addEventListener('click', () => {
     } else {
         cleanContainer({
             elemInGroup: +ScatterGroup.value,
-            timeElemScatter: TimeScatter.value ** 2 / 50,
+            timeElemScatter: TimeScatter.value ** 2 / 450,
             maxTimeRandomStart: +MaxTimeStart.value,
             scatterLength: +MaxScatterLength.value
         });
