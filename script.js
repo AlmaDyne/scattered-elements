@@ -84,8 +84,6 @@ function cleanContainer(options) {
 
     let {timeElemHover, timeElemScatter, maxTimeRandomStart, elemInGroup, scatterLength} = parameters;
 
-    console.log(timeElemScatter);
-
     if (scatterElemAmount !== elemArray.length) {
         const lastIdxInGroup = (scatterElemAmount + elemInGroup <= elemArray.length) ?
             scatterElemAmount + elemInGroup :
