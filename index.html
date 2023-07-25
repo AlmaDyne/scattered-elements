@@ -11,7 +11,13 @@
         </div>
         <div class="FlexMain">
             <div class="FlexArea Flex1">
-                <h4>Container</h4>
+                <div class="ContainerInfo">
+                    <div class="ExampleElement Allowed"></div>
+                    <span>Разрешённые для выбрасывания элементы</span>
+                    <br>
+                    <div class="ExampleElement Blocked"></div>
+                    <span>Запрещённые для выбрасывания элементы</span>
+                </div>
                 <div id="ElementsContainer"></div>
             </div>
             <div class="FlexArea Flex2">
@@ -79,7 +85,7 @@
                     <div class="FlexArea Flex3-1-2">
                         <ul class="ParametersList">
                             <li class="ParamListLine">
-                                <label for="ScatterGroup">Кол-во выбрасываемых элементов, <i>шт. (1 - 100)</i>:</label>
+                                <label for="ScatterGroup">Кол-во выбрасыв. элементов в группе, <i>шт. (1 - 100)</i>:</label>
                                 <input id="ScatterGroup" type="number" value="5" min="1" max="100">
                             </li>
                             <li class="ParamListLine">

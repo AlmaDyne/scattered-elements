@@ -12,6 +12,7 @@ let timerWarn = null,
     indexes = [],
     elemArray,
     scatterElemAmount,
+    scatterElemSum,
     timeOnClick,
     addTimeWait,
     fillContPermission,
@@ -63,16 +64,6 @@ scatterButton.addEventListener('click', () => {
     }
 });
 
-function elemClick() {
-    if (this.hasAttribute('data-selected')) {
-        this.removeAttribute('data-selected');
-        this.style.background = 'rgb(176, 255, 123)';
-    } else {
-        this.setAttribute('data-selected', '');
-        this.style.background = 'rgb(255, 123, 200)';
-    }
-}
-
 function cleanContainer(options) {
     const parameters = Object.assign({
         timeElemHover: 100,
@@ -83,7 +74,7 @@ function cleanContainer(options) {
     }, options);
 
     let {timeElemHover, timeElemScatter, maxTimeRandomStart, elemInGroup, scatterLength} = parameters;
-
+    
     if (scatterElemAmount !== elemArray.length) {
         const lastIdxInGroup = (scatterElemAmount + elemInGroup <= elemArray.length) ?
             scatterElemAmount + elemInGroup :
@@ -92,6 +83,8 @@ function cleanContainer(options) {
             scatterElemAmount + Math.round(- 0.5 + Math.random() * elemInGroup) :
             scatterElemAmount + Math.round(- 0.5 + Math.random() * (elemArray.length - scatterElemAmount));
         const timeRandomStartArray = [];
+        let scatterElemCount = 0;
+        let timeBlockFX = 0;
 
         if (scatterElemAmount === 0) timeOnClick = Date.now();
 
@@ -100,26 +93,34 @@ function cleanContainer(options) {
         timeOnClick = Date.now();
 
         for (let i = scatterElemAmount; i < lastIdxInGroup; i++) {
-            const timeRandomStart = (i === fastElemIdx) ? 0 : Math.ceil(Math.random() * maxTimeRandomStart);
-            timeRandomStartArray.push(timeRandomStart);
+            if (!elemArray[indexes[i] - 1].classList.contains('ElemBlocked')) {
+                const timeRandomStart = (i === fastElemIdx) ? 0 : Math.ceil(Math.random() * maxTimeRandomStart);
+                timeRandomStartArray.push(timeRandomStart);
 
-            timersRandomStartsArray[i] = setTimeout(() => {
-                const x = randomInteger(-scatterLength, scatterLength),
-                    y = randomInteger(-scatterLength, scatterLength),
-                    z = randomNumber(0.3, 2),
-                    g = shuffle([-1, 1])[0] * 360;
-                
-                elemArray[indexes[i] - 1].setAttribute('disabled', '');
-                elemArray[indexes[i] - 1].style.cursor = 'default';
-                elemArray[indexes[i] - 1].style.transition = timeElemScatter + 'ms ease-in-out';
-                elemArray[indexes[i] - 1].style.transform = `translate(${x}px, ${y}px) rotate(${g}deg) scale(${z})`;
-                elemArray[indexes[i] - 1].style.opacity = 0;
-                elemArray[indexes[i] - 1].style.visibility = "hidden";
-            }, timeRandomStart);
+                timersRandomStartsArray[i] = setTimeout(() => {
+                    const x = randomInteger(-scatterLength, scatterLength),
+                        y = randomInteger(-scatterLength, scatterLength),
+                        z = randomNumber(0.3, 2),
+                        g = shuffle([-1, 1])[0] * 360;
+                    
+                    elemArray[indexes[i] - 1].setAttribute('disabled', '');
+                    elemArray[indexes[i] - 1].style.cursor = 'default';
+                    elemArray[indexes[i] - 1].style.transition = timeElemScatter + 'ms ease-in-out';
+                    elemArray[indexes[i] - 1].style.transform = `translate(${x}px, ${y}px) rotate(${g}deg) scale(${z})`;
+                    elemArray[indexes[i] - 1].style.opacity = 0;
+                    elemArray[indexes[i] - 1].style.visibility = "hidden";
+                }, timeRandomStart);
+
+                scatterElemCount++;
+            } else {
+                elemArray[indexes[i] - 1].classList.add('BlockedAnimation');
+                const blockFX = document.querySelector('.BlockedAnimation');
+                timeBlockFX = parseFloat(getComputedStyle(blockFX).animationDuration) * 1000;
+            }
         }
 
-        addTimeWait = Math.max(addTimeWait, ...timeRandomStartArray);
-
+        addTimeWait = Math.max(addTimeWait, ...timeRandomStartArray, timeBlockFX);
+        scatterElemSum += scatterElemCount;
         scatterElemAmount += elemInGroup;
 
         if (scatterElemAmount >= elemArray.length) {
@@ -132,10 +133,25 @@ function cleanContainer(options) {
             scatterButton.style.cursor = 'not-allowed';
             scatterButton.children[0].innerHTML = '<b>...Ожидание...</b>';
 
-            infoArea.innerHTML += 'Выброшено элементов: ' + scatterElemAmount + ' (все)' + '\n\n';
-            infoArea.scrollTop = infoArea.scrollHeight;
+            if (scatterElemSum && scatterElemSum === scatterElemAmount) {
+                infoArea.innerHTML += `Выброшено элементов: ${scatterElemSum} (+${scatterElemCount}) (все)\n\n`;
+                infoArea.scrollTop = infoArea.scrollHeight;
+            } else if (scatterElemSum && scatterElemSum !== scatterElemAmount) {
+                infoArea.innerHTML += `Выброшено элементов: ${scatterElemSum} (+${scatterElemCount}) (все разрешённые)\n\n`;
+                infoArea.scrollTop = infoArea.scrollHeight;
+            } else if (!scatterElemSum) {
+                infoArea.innerHTML += `Выброшено элементов: ${scatterElemSum} (+${scatterElemCount}) (все блокированы)\n\n`;
+                infoArea.scrollTop = infoArea.scrollHeight;
+            }
+            
+            if (!scatterElemCount) timeElemScatter = 0;
 
-            new Promise(resolve => timerWait = setTimeout(resolve, timeElemScatter + addTimeWait))
+            const maxTimeWait = Math.max(
+                addTimeWait,
+                timeElemScatter + Math.max(...timeRandomStartArray)
+            );
+            
+            new Promise(resolve => timerWait = setTimeout(resolve, maxTimeWait))
                 .finally(() => {
                     fillContPermission = true;
                     clickCountPermission = true;
@@ -146,11 +162,16 @@ function cleanContainer(options) {
                     scatterButton.style.cursor = 'pointer';
                     scatterButton.children[0].innerHTML = '<b>Заполнить контейнер</b>';
 
-                    infoArea.innerHTML += 'Контейнер пуст.' + '\n\n';
-                    infoArea.scrollTop = infoArea.scrollHeight;
+                    if (scatterElemSum === scatterElemAmount) {
+                        infoArea.innerHTML += `Контейнер пуст.\n\n`;
+                        infoArea.scrollTop = infoArea.scrollHeight;
+                    } else {
+                        infoArea.innerHTML += `Контейнер не имеет элементов, разрешённых для выброса.\n\n`;
+                        infoArea.scrollTop = infoArea.scrollHeight;
+                    }
                 });
         } else {
-            infoArea.innerHTML += 'Выброшено элементов: ' + scatterElemAmount + '\n';
+            infoArea.innerHTML += `Выброшено элементов: ${scatterElemSum} (+${scatterElemCount}) \n`;
             infoArea.scrollTop = infoArea.scrollHeight;
         }
     } else if (scatterElemAmount === elemArray.length && fillContPermission) {
@@ -167,7 +188,7 @@ function cleanContainer(options) {
 
         infoArea.innerHTML += 'Контейнер заполняется...\n\n';
         infoArea.scrollTop = infoArea.scrollHeight;
-        
+
         Promise.all(elemArray.map((elem, idx) => new Promise(resolve => {
             const timeRandomStart = (idx === fastElemIdx) ? 0 : Math.ceil(Math.random() * maxTimeRandomStart);
 
@@ -177,20 +198,21 @@ function cleanContainer(options) {
                 elem.style.opacity = 1;
                 elem.style.visibility = "visible";
 
-                new Promise(res => timerWait = setTimeout(res, timeElemScatter))
+                new Promise(res => timerWait = setTimeout(res, (scatterElemSum === 0) ? 0 : timeElemScatter))
                     .finally(() => resolve(elem));
-            }, timeRandomStart);
+            }, (scatterElemSum === 0) ? 0 : timeRandomStart);
         })))
             .then(elemArray => {
                 for (let elem of elemArray) {
                     elem.style.transition = timeElemHover + 'ms ease';
                     elem.style.cursor = 'pointer';
-                    elem.removeAttribute('disabled');
+                    elem.className = 'Element';
                 }
 
                 shuffle(indexes);
 
                 scatterElemAmount = 0;
+                scatterElemSum = 0;
                 addTimeWait = 0;
                 timersRandomStartsArray.length = 0;
                 clickCountPermission = true;
@@ -217,12 +239,13 @@ function initialContainer() {
     fillContPermission = false;
     elemArray = [].slice.call(document.querySelectorAll('.Element'));
     scatterElemAmount = 0;
+    scatterElemSum = 0;
     addTimeWait = 0;
     timersRandomStartsArray.length = 0;
     indexes.length = 0;
 
     for (let i = 0; i < elemArray.length; i++) {
-        elemArray[i].addEventListener('click', elemClick);
+        elemArray[i].addEventListener('click', () => elemArray[i].classList.add('ElemBlocked'));
         indexes.push(i + 1);
     }
 
@@ -252,12 +275,12 @@ function createContainer(contSideElemAmount) {
 
     for (let i = 1; i <= elemQuantity; i++) {
         let divElement = document.createElement('div');
+
         divElement.className = 'Element';
         divElement.style.width= `${elemSideSize}px`;
         divElement.style.height = `${elemSideSize}px`;
         divElement.style.lineHeight = `${elemSideSize}px`;
         divElement.style.margin = `${elemDistance}px 0 0 ${elemDistance}px`;
-        divElement.style.background = 'rgb(176, 255, 123)';
         divElement.innerHTML = `<spin>&#9678</spin>${i}+`;
         elemContainer.append(divElement);
     }

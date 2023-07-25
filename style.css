@@ -47,16 +47,12 @@ h1, h4 {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 30px 0;
+    padding: 20px 0;
 }
 
 .Flex1 {
     flex-direction: column;
     flex: 11;
-}
-
-.Flex1 > h4 {
-    opacity: 0;
 }
 
 .Flex2 {
@@ -91,6 +87,32 @@ h1, h4 {
     flex: 1;
 }
 
+.ContainerInfo {
+    position: relative;
+    z-index: 1;
+}
+
+.ContainerInfo > .ExampleElement {
+    display: inline-block;
+    height: 20px;
+    width: 20px;
+    border: 1px solid #0524d4;
+    box-sizing: border-box;
+}
+
+.ContainerInfo > .ExampleElement, .ContainerInfo > span {
+    margin: 3px;
+    vertical-align: middle;
+}
+
+.ContainerInfo .Allowed {
+    background: #b0ff7b;
+}
+
+.ContainerInfo .Blocked {
+    background: #ff7bc8;
+}
+
 #ElementsContainer {
     margin-top: 6px;
     background: linear-gradient(to top right, #c2d1ff, 
@@ -102,6 +124,7 @@ h1, h4 {
 
 .Element {
     display: inline-block;
+    background: #b0ff7b;
     text-align: center;
     border: 1px solid #0524d4;
     box-sizing: border-box;
@@ -114,6 +137,20 @@ h1, h4 {
 
 .Element:not([disabled]):hover {
     transform: translate(3px, 3px) !important;
+}
+
+.ElemBlocked {
+    background: #ff7bc8;
+}
+
+.BlockedAnimation {
+    animation: ElemBlockedFX 700ms ease-out;
+}
+
+@keyframes ElemBlockedFX {
+    0% { border: 1px solid #ff0000; background: #ff7bc8; }
+    50% { border: 1px solid #ff0000; background: #fdff7b; }
+    100% { border: 1px solid #0524d4; background: #ff7bc8; }
 }
 
 .TextInfo {
@@ -207,7 +244,7 @@ h1, h4 {
     vertical-align: middle;
 }
 
-.Table-ContSizes::before, .ParametersList::before, .H4Background::before {
+.ContainerInfo::before, .Table-ContSizes::before, .ParametersList::before, .H4Background::before {
     content: '';
     position: absolute;
     left: 0; right: 0; top: 0; bottom: 0;
