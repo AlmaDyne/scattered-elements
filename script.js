@@ -8,14 +8,14 @@ const infoArea = document.querySelector('.TextInfo');
 let timerWarn = null,
     timerWait = null,
     timersRandomStartsArray = [],
-    iClick = 0,
     indexes = [],
+    iClick = 0,
     elemArray,
     scatterElemAmount,
     scatterElemSum,
     timeOnClick,
-    addTimeWait,
-    fillContPermission,
+    maxTimeWait,
+    fillContainerPermission,
     clickCountPermission;
 
 scatterButton.insertAdjacentHTML('beforeend', '<p id="ClickInfo">(Не нажато)</p>');
@@ -27,7 +27,6 @@ for (let radioButton of document.querySelectorAll('input[name="ContainerSize"]')
         for (let timer of timersRandomStartsArray) {
             clearTimeout(timer);
         }
-        
         clearTimeout(timerWait);
         
         elemContainer.innerHTML = '';
@@ -37,10 +36,7 @@ for (let radioButton of document.querySelectorAll('input[name="ContainerSize"]')
 }
 
 scatterButton.addEventListener('click', () => {
-    if (clickCountPermission) {
-        iClick++;
-        clickCount(iClick);
-    }
+    if (clickCountPermission) clickCount(++iClick);
 
     const ScatterGroup = document.getElementById('ScatterGroup');
     const MaxScatterLength = document.getElementById('MaxScatterLength');
@@ -57,7 +53,7 @@ scatterButton.addEventListener('click', () => {
     } else {
         cleanContainer({
             elemInGroup: +ScatterGroup.value,
-            timeElemScatter: TimeScatter.value ** 2 / 450,
+            timeElemScatter: Math.round(TimeScatter.value ** 2 / 450),
             maxTimeRandomStart: +MaxTimeStart.value,
             scatterLength: +MaxScatterLength.value
         });
@@ -79,23 +75,23 @@ function cleanContainer(options) {
         const lastIdxInGroup = (scatterElemAmount + elemInGroup <= elemArray.length) ?
             scatterElemAmount + elemInGroup :
             elemArray.length;
-        const fastElemIdx = (scatterElemAmount + elemInGroup <= elemArray.length) ?
-            scatterElemAmount + Math.round(- 0.5 + Math.random() * elemInGroup) :
-            scatterElemAmount + Math.round(- 0.5 + Math.random() * (elemArray.length - scatterElemAmount));
-        const timeRandomStartArray = [];
+        let fastElemIdx = null;
+        let timesScatterArray = [];
         let scatterElemCount = 0;
         let timeBlockFX = 0;
 
         if (scatterElemAmount === 0) timeOnClick = Date.now();
-
-        // От предыдущего максимума добавочного времени отнимаем разницу между кликами
-        addTimeWait -= Date.now() - timeOnClick;
+        maxTimeWait -= Date.now() - timeOnClick;
         timeOnClick = Date.now();
 
         for (let i = scatterElemAmount; i < lastIdxInGroup; i++) {
-            if (!elemArray[indexes[i] - 1].classList.contains('ElemBlocked')) {
+            const elem = elemArray[indexes[i] - 1];
+
+            if (!elem.classList.contains('ElemBlocked')) {
+                elem.removeEventListener('click', elemClick);
+
+                if (fastElemIdx === null) fastElemIdx = i;
                 const timeRandomStart = (i === fastElemIdx) ? 0 : Math.ceil(Math.random() * maxTimeRandomStart);
-                timeRandomStartArray.push(timeRandomStart);
 
                 timersRandomStartsArray[i] = setTimeout(() => {
                     const x = randomInteger(-scatterLength, scatterLength),
@@ -103,23 +99,23 @@ function cleanContainer(options) {
                         z = randomNumber(0.3, 2),
                         g = shuffle([-1, 1])[0] * 360;
                     
-                    elemArray[indexes[i] - 1].setAttribute('disabled', '');
-                    elemArray[indexes[i] - 1].style.cursor = 'default';
-                    elemArray[indexes[i] - 1].style.transition = timeElemScatter + 'ms ease-in-out';
-                    elemArray[indexes[i] - 1].style.transform = `translate(${x}px, ${y}px) rotate(${g}deg) scale(${z})`;
-                    elemArray[indexes[i] - 1].style.opacity = 0;
-                    elemArray[indexes[i] - 1].style.visibility = "hidden";
+                    elem.setAttribute('nohover', '');
+                    elem.style.cursor = 'default';
+                    elem.style.transition = timeElemScatter + 'ms ease-in-out';
+                    elem.style.transform = `translate(${x}px, ${y}px) rotate(${g}deg) scale(${z})`;
+                    elem.style.opacity = 0;
+                    elem.style.visibility = "hidden";
                 }, timeRandomStart);
 
+                timesScatterArray.push(timeRandomStart + timeElemScatter);
                 scatterElemCount++;
             } else {
-                elemArray[indexes[i] - 1].classList.add('BlockedAnimation');
-                const blockFX = document.querySelector('.BlockedAnimation');
-                timeBlockFX = parseFloat(getComputedStyle(blockFX).animationDuration) * 1000;
+                elem.classList.add('ElemBlockedFX');
+                timeBlockFX = parseFloat(getComputedStyle(elem).animationDuration) * 1000;
             }
         }
 
-        addTimeWait = Math.max(addTimeWait, ...timeRandomStartArray, timeBlockFX);
+        maxTimeWait = Math.max(maxTimeWait, ...timesScatterArray, timeBlockFX);
         scatterElemSum += scatterElemCount;
         scatterElemAmount += elemInGroup;
 
@@ -143,17 +139,12 @@ function cleanContainer(options) {
                 infoArea.innerHTML += `Выброшено элементов: ${scatterElemSum} (+${scatterElemCount}) (все блокированы)\n\n`;
                 infoArea.scrollTop = infoArea.scrollHeight;
             }
-            
-            if (!scatterElemCount) timeElemScatter = 0;
 
-            const maxTimeWait = Math.max(
-                addTimeWait,
-                timeElemScatter + Math.max(...timeRandomStartArray)
-            );
-            
             new Promise(resolve => timerWait = setTimeout(resolve, maxTimeWait))
                 .finally(() => {
-                    fillContPermission = true;
+                    elemArray.forEach(elem => elem.classList.remove('ElemBlockedFX'));
+
+                    fillContainerPermission = true;
                     clickCountPermission = true;
                     
                     scatterButton.removeAttribute('disabled');
@@ -174,10 +165,11 @@ function cleanContainer(options) {
             infoArea.innerHTML += `Выброшено элементов: ${scatterElemSum} (+${scatterElemCount}) \n`;
             infoArea.scrollTop = infoArea.scrollHeight;
         }
-    } else if (scatterElemAmount === elemArray.length && fillContPermission) {
-        const fastElemIdx = Math.round(-0.5 + Math.random() * elemArray.length);
+    } else if (scatterElemAmount === elemArray.length && fillContainerPermission) {
+        const allowedElemArray = elemArray.filter(elem => !elem.classList.contains('ElemBlocked'));
+        const fastElemIdx = Math.round(-0.5 + Math.random() * allowedElemArray.length);
 
-        fillContPermission = false;
+        fillContainerPermission = false;
         clickCountPermission = false;
 
         scatterButton.setAttribute('disabled', '');
@@ -190,22 +182,36 @@ function cleanContainer(options) {
         infoArea.scrollTop = infoArea.scrollHeight;
 
         Promise.all(elemArray.map((elem, idx) => new Promise(resolve => {
-            const timeRandomStart = (idx === fastElemIdx) ? 0 : Math.ceil(Math.random() * maxTimeRandomStart);
+            elem.classList.add('ElemRestoreFX');
+            elem.style.animationDuration = timeElemScatter + 'ms';
 
-            timersRandomStartsArray[idx] = setTimeout(() => {
-                elem.style.transition = timeElemScatter + 'ms ease';
-                elem.style.transform = 'translate(0, 0) rotate(0deg) scale(1)';
-                elem.style.opacity = 1;
-                elem.style.visibility = "visible";
+            if (!elem.classList.contains('ElemBlocked')) {
+                const timeRandomStart = (elem === allowedElemArray[fastElemIdx]) ?
+                    0 : Math.ceil(Math.random() * maxTimeRandomStart);
 
-                new Promise(res => timerWait = setTimeout(res, (scatterElemSum === 0) ? 0 : timeElemScatter))
+                timersRandomStartsArray[idx] = setTimeout(() => {
+                    elem.style.transition = timeElemScatter + 'ms ease';
+                    elem.style.transform = 'translate(0, 0) rotate(0deg) scale(1)';
+                    elem.style.opacity = 1;
+                    elem.style.visibility = "visible";
+
+                    new Promise(res => timerWait = setTimeout(res, timeElemScatter))
+                        .finally(() => {
+                            elem.style.transition = timeElemHover + 'ms ease';
+                            elem.removeAttribute('nohover');
+                            elem.style.cursor = 'pointer';
+                            resolve(elem);
+                        });
+                }, timeRandomStart);
+            } else {
+                new Promise(res => timerWait = setTimeout(res, timeElemScatter))
                     .finally(() => resolve(elem));
-            }, (scatterElemSum === 0) ? 0 : timeRandomStart);
+            }
         })))
             .then(elemArray => {
                 for (let elem of elemArray) {
-                    elem.style.transition = timeElemHover + 'ms ease';
-                    elem.style.cursor = 'pointer';
+                    elem.addEventListener('click', elemClick);
+                    elem.style.animationDuration = '';
                     elem.className = 'Element';
                 }
 
@@ -213,7 +219,7 @@ function cleanContainer(options) {
 
                 scatterElemAmount = 0;
                 scatterElemSum = 0;
-                addTimeWait = 0;
+                maxTimeWait = 0;
                 timersRandomStartsArray.length = 0;
                 clickCountPermission = true;
                 
@@ -236,16 +242,17 @@ function initialContainer() {
     createContainer(contSideElemAmount);
 
     clickCountPermission = true;
-    fillContPermission = false;
+    fillContainerPermission = false;
+
     elemArray = [].slice.call(document.querySelectorAll('.Element'));
     scatterElemAmount = 0;
     scatterElemSum = 0;
-    addTimeWait = 0;
+    maxTimeWait = 0;
     timersRandomStartsArray.length = 0;
     indexes.length = 0;
 
     for (let i = 0; i < elemArray.length; i++) {
-        elemArray[i].addEventListener('click', () => elemArray[i].classList.add('ElemBlocked'));
+        elemArray[i].addEventListener('click', elemClick);
         indexes.push(i + 1);
     }
 
@@ -259,16 +266,16 @@ function initialContainer() {
 
     infoArea.innerHTML =
         'Элементы в контейнере (' + elemArray.length + '):\n' +
-        elemArray.map(elem => elem.innerText).join(', ') + '\n\n' +
+        elemArray.map(elem => elem.textContent).join(', ') + '\n\n' +
         'Индексы элементов в порядке выбрасывания:\n' + indexes.join(', ') + '\n\n';
     infoArea.scrollTop = infoArea.scrollHeight;
 };
 
 function createContainer(contSideElemAmount) {
-    const elemSideSize = 74;
-    const elemDistance = Math.round(30 / (contSideElemAmount + 1) + 4);
+    const ELEM_SIDE_SIZE = 72;
+    const elemDistance = Math.round(ELEM_SIDE_SIZE / (contSideElemAmount + ELEM_SIDE_SIZE / 10) + 2);
     const elemQuantity = contSideElemAmount * contSideElemAmount;
-    const contSideSize = elemDistance + contSideElemAmount * (elemDistance + elemSideSize);
+    const contSideSize = elemDistance + contSideElemAmount * (elemDistance + ELEM_SIDE_SIZE);
 
     elemContainer.style.width = `${contSideSize}px`;
     elemContainer.style.height = `${contSideSize}px`;
@@ -277,16 +284,20 @@ function createContainer(contSideElemAmount) {
         let divElement = document.createElement('div');
 
         divElement.className = 'Element';
-        divElement.style.width= `${elemSideSize}px`;
-        divElement.style.height = `${elemSideSize}px`;
-        divElement.style.lineHeight = `${elemSideSize}px`;
+        divElement.style.width= `${ELEM_SIDE_SIZE}px`;
+        divElement.style.height = `${ELEM_SIDE_SIZE}px`;
+        divElement.style.lineHeight = `${ELEM_SIDE_SIZE}px`;
         divElement.style.margin = `${elemDistance}px 0 0 ${elemDistance}px`;
         divElement.innerHTML = `<spin>&#9678</spin>${i}+`;
         elemContainer.append(divElement);
     }
 
     [].slice.call(document.querySelectorAll('.Element'))
-        .forEach(el => el.style.fontSize = `${Math.round(elemSideSize / 6)}pt`);
+        .forEach(el => el.style.fontSize = `${Math.round(ELEM_SIDE_SIZE / 6)}pt`);
     [].slice.call(document.querySelectorAll('.Element > spin'))
-        .forEach(el => el.style.fontSize = `${Math.round(elemSideSize / 2.5)}pt`);
+        .forEach(el => el.style.fontSize = `${Math.round(ELEM_SIDE_SIZE / 2.5)}pt`);
+}
+
+function elemClick() {
+    this.classList.add('ElemBlocked');
 }
