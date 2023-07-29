@@ -153,13 +153,13 @@ h1, h4 {
 
 @keyframes BlockedElements {
     0% { border: 1px solid #ff0000; background: #ff7bc8; }
-    50% { border: 1px solid #ff0000; background: #fdff7b; }
+    25% { border: 1px solid #ff0000; background: #fdff7b; }
     100% { border: 1px solid #0524d4; background: #ff7bc8; }
 }
 
 @keyframes RestoreElements {
     0% { border: 1px solid #0524d4; background: #ff7bc8; }
-    10% { border: 1px solid #ff0000; background: #fdff7b; }
+    35% { border: 1px solid #ff0000; background: #fdff7b; }
     100% { border: 1px solid #0524d4; background: #b0ff7b; }
 }
 

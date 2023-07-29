@@ -182,15 +182,14 @@ function cleanContainer(options) {
         infoArea.scrollTop = infoArea.scrollHeight;
 
         Promise.all(elemArray.map((elem, idx) => new Promise(resolve => {
-            elem.classList.add('ElemRestoreFX');
-            elem.style.animationDuration = timeElemScatter + 'ms';
-
             if (!elem.classList.contains('ElemBlocked')) {
                 const timeRandomStart = (elem === allowedElemArray[fastElemIdx]) ?
                     0 : Math.ceil(Math.random() * maxTimeRandomStart);
 
                 timersRandomStartsArray[idx] = setTimeout(() => {
                     elem.style.transition = timeElemScatter + 'ms ease';
+                    elem.classList.add('ElemRestoreFX');
+                    elem.style.animationDuration = timeElemScatter + 'ms';
                     elem.style.transform = 'translate(0, 0) rotate(0deg) scale(1)';
                     elem.style.opacity = 1;
                     elem.style.visibility = "visible";
@@ -204,6 +203,9 @@ function cleanContainer(options) {
                         });
                 }, timeRandomStart);
             } else {
+                elem.classList.add('ElemRestoreFX');
+                elem.style.animationDuration = timeElemScatter + 'ms';
+                
                 new Promise(res => timerWait = setTimeout(res, timeElemScatter))
                     .finally(() => resolve(elem));
             }
