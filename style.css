@@ -159,7 +159,8 @@ h1, h4 {
 
 @keyframes RestoreElements {
     0% { border: 1px solid #0524d4; background: #ff7bc8; }
-    35% { border: 1px solid #ff0000; background: #fdff7b; }
+    10% { border: 1px solid #ff0000; background: #ffbb7b; }
+    40% { border: 1px solid #ff0000; background: #fdff7b; }
     100% { border: 1px solid #0524d4; background: #b0ff7b; }
 }
 

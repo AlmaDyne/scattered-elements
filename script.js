@@ -7,8 +7,8 @@ const elemContainer = document.getElementById('ElementsContainer');
 const infoArea = document.querySelector('.TextInfo');
 let timerWarn = null,
     timerWait = null,
-    timersRandomStartsArray = [],
     indexes = [],
+    orderedTimesRS = new Map(),
     iClick = 0,
     elemArray,
     scatterElemAmount,
@@ -19,20 +19,11 @@ let timerWarn = null,
     clickCountPermission;
 
 scatterButton.insertAdjacentHTML('beforeend', '<p id="ClickInfo">(Не нажато)</p>');
-
+    
 initialContainer();
 
 for (let radioButton of document.querySelectorAll('input[name="ContainerSize"]')) {
-    radioButton.addEventListener('click', () => {     
-        for (let timer of timersRandomStartsArray) {
-            clearTimeout(timer);
-        }
-        clearTimeout(timerWait);
-        
-        elemContainer.innerHTML = '';
-
-        initialContainer();
-    });
+    radioButton.addEventListener('click', () => initialContainer());
 }
 
 scatterButton.addEventListener('click', () => {
@@ -54,7 +45,7 @@ scatterButton.addEventListener('click', () => {
         cleanContainer({
             elemInGroup: +ScatterGroup.value,
             timeElemScatter: Math.round(TimeScatter.value ** 2 / 450),
-            maxTimeRandomStart: +MaxTimeStart.value,
+            maxTimeRS: +MaxTimeStart.value,
             scatterLength: +MaxScatterLength.value
         });
     }
@@ -64,19 +55,19 @@ function cleanContainer(options) {
     const parameters = Object.assign({
         timeElemHover: 100,
         timeElemScatter: 500,
-        maxTimeRandomStart: 350,
+        maxTimeRS: 350,
         elemInGroup: 5,
         scatterLength: 500
     }, options);
 
-    let {timeElemHover, timeElemScatter, maxTimeRandomStart, elemInGroup, scatterLength} = parameters;
+    let {timeElemHover, timeElemScatter, maxTimeRS, elemInGroup, scatterLength} = parameters;
     
     if (scatterElemAmount !== elemArray.length) {
         const lastIdxInGroup = (scatterElemAmount + elemInGroup <= elemArray.length) ?
             scatterElemAmount + elemInGroup :
             elemArray.length;
         let fastElemIdx = null;
-        let timesScatterArray = [];
+        let sumTimesGroup = [];
         let scatterElemCount = 0;
         let timeBlockFX = 0;
 
@@ -85,15 +76,17 @@ function cleanContainer(options) {
         timeOnClick = Date.now();
 
         for (let i = scatterElemAmount; i < lastIdxInGroup; i++) {
+            // Если создать ссылку на элемент и заменить их на неё во всём цикле,
+            // то таймеры случайного старта автоматически удалятся при инициализации контейнера
             const elem = elemArray[indexes[i] - 1];
 
             if (!elem.classList.contains('ElemBlocked')) {
                 elem.removeEventListener('click', elemClick);
 
                 if (fastElemIdx === null) fastElemIdx = i;
-                const timeRandomStart = (i === fastElemIdx) ? 0 : Math.ceil(Math.random() * maxTimeRandomStart);
+                const timeRandomStart = (i === fastElemIdx) ? 0 : Math.ceil(Math.random() * maxTimeRS);
 
-                timersRandomStartsArray[i] = setTimeout(() => {
+                setTimeout(() => {
                     const x = randomInteger(-scatterLength, scatterLength),
                         y = randomInteger(-scatterLength, scatterLength),
                         z = randomNumber(0.3, 2),
@@ -107,7 +100,8 @@ function cleanContainer(options) {
                     elem.style.visibility = "hidden";
                 }, timeRandomStart);
 
-                timesScatterArray.push(timeRandomStart + timeElemScatter);
+                orderedTimesRS.set(elem, timeRandomStart);
+                sumTimesGroup.push(timeRandomStart + timeElemScatter);
                 scatterElemCount++;
             } else {
                 elem.classList.add('ElemBlockedFX');
@@ -115,14 +109,14 @@ function cleanContainer(options) {
             }
         }
 
-        maxTimeWait = Math.max(maxTimeWait, ...timesScatterArray, timeBlockFX);
+        maxTimeWait = Math.max(maxTimeWait, ...sumTimesGroup, timeBlockFX);
         scatterElemSum += scatterElemCount;
         scatterElemAmount += elemInGroup;
 
         if (scatterElemAmount >= elemArray.length) {
             scatterElemAmount = elemArray.length;
             clickCountPermission = false;
-
+            
             scatterButton.setAttribute('disabled', '');
             scatterButton.style.backgroundColor = '#ccc';
             scatterButton.style.border = '1px solid #999';
@@ -166,9 +160,6 @@ function cleanContainer(options) {
             infoArea.scrollTop = infoArea.scrollHeight;
         }
     } else if (scatterElemAmount === elemArray.length && fillContainerPermission) {
-        const allowedElemArray = elemArray.filter(elem => !elem.classList.contains('ElemBlocked'));
-        const fastElemIdx = Math.round(-0.5 + Math.random() * allowedElemArray.length);
-
         fillContainerPermission = false;
         clickCountPermission = false;
 
@@ -180,34 +171,44 @@ function cleanContainer(options) {
 
         infoArea.innerHTML += 'Контейнер заполняется...\n\n';
         infoArea.scrollTop = infoArea.scrollHeight;
+        
+        let maxTimeRS = 0;
+
+        for (let elem of elemArray) {
+            let timeRS = orderedTimesRS.get(elem) || 0;
+                
+            if (timeRS > maxTimeRS) maxTimeRS = timeRS;
+        }
 
         Promise.all(elemArray.map((elem, idx) => new Promise(resolve => {
             if (!elem.classList.contains('ElemBlocked')) {
-                const timeRandomStart = (elem === allowedElemArray[fastElemIdx]) ?
-                    0 : Math.ceil(Math.random() * maxTimeRandomStart);
-
-                timersRandomStartsArray[idx] = setTimeout(() => {
-                    elem.style.transition = timeElemScatter + 'ms ease';
+                setTimeout(() => {
                     elem.classList.add('ElemRestoreFX');
                     elem.style.animationDuration = timeElemScatter + 'ms';
+                    elem.style.transition = timeElemScatter + 'ms ease';
                     elem.style.transform = 'translate(0, 0) rotate(0deg) scale(1)';
                     elem.style.opacity = 1;
                     elem.style.visibility = "visible";
 
                     new Promise(res => timerWait = setTimeout(res, timeElemScatter))
                         .finally(() => {
+                            console.log((idx + 1) + ': ' + (timeElemScatter + orderedTimesRS.get(elem)));
+
                             elem.style.transition = timeElemHover + 'ms ease';
                             elem.removeAttribute('nohover');
                             elem.style.cursor = 'pointer';
                             resolve(elem);
                         });
-                }, timeRandomStart);
+                }, orderedTimesRS.get(elem)); // Время задержки было запомнено во время выброса элемента
             } else {
                 elem.classList.add('ElemRestoreFX');
-                elem.style.animationDuration = timeElemScatter + 'ms';
+                elem.style.animationDuration = (maxTimeRS + timeElemScatter) + 'ms';
                 
-                new Promise(res => timerWait = setTimeout(res, timeElemScatter))
-                    .finally(() => resolve(elem));
+                new Promise(res => timerWait = setTimeout(res, maxTimeRS + timeElemScatter))
+                    .finally(() => {
+                        console.log((idx + 1) + ': ' + (maxTimeRS + timeElemScatter));
+                        resolve(elem);
+                    });
             }
         })))
             .then(elemArray => {
@@ -219,11 +220,11 @@ function cleanContainer(options) {
 
                 shuffle(indexes);
 
+                clickCountPermission = true;
+                orderedTimesRS.clear();
                 scatterElemAmount = 0;
                 scatterElemSum = 0;
                 maxTimeWait = 0;
-                timersRandomStartsArray.length = 0;
-                clickCountPermission = true;
                 
                 scatterButton.removeAttribute('disabled');
                 scatterButton.style.backgroundColor = '#fcff3b';
@@ -240,17 +241,19 @@ function cleanContainer(options) {
 }
 
 function initialContainer() {
+    elemContainer.innerHTML = '';
+
     const contSideElemAmount = +document.querySelector('input[name="ContainerSize"]:checked').value;
     createContainer(contSideElemAmount);
 
+    clearTimeout(timerWait);
     clickCountPermission = true;
     fillContainerPermission = false;
-
     elemArray = [].slice.call(document.querySelectorAll('.Element'));
+    orderedTimesRS.clear();
     scatterElemAmount = 0;
     scatterElemSum = 0;
     maxTimeWait = 0;
-    timersRandomStartsArray.length = 0;
     indexes.length = 0;
 
     for (let i = 0; i < elemArray.length; i++) {
