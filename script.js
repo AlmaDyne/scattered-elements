@@ -5,6 +5,10 @@ import { clickCount, shuffle, randomNumber, randomInteger } from "./function_sto
 const scatterButton = document.querySelector('.ClickingObject');
 const elemContainer = document.getElementById('ElementsContainer');
 const infoArea = document.querySelector('.TextInfo');
+const ScatterGroup = document.getElementById('ScatterGroup');
+const TimeScatter = document.getElementById('TimeScatter');
+const MaxTimeStart = document.getElementById('MaxTimeStart');
+const MaxScatterLength = document.getElementById('MaxScatterLength');
 let timerWarn = null,
     timerWait = null,
     indexes = [],
@@ -28,11 +32,6 @@ for (let radioButton of document.querySelectorAll('input[name="ContainerSize"]')
 
 scatterButton.addEventListener('click', () => {
     if (clickCountPermission) clickCount(++iClick);
-
-    const ScatterGroup = document.getElementById('ScatterGroup');
-    const MaxScatterLength = document.getElementById('MaxScatterLength');
-    const TimeScatter = document.getElementById('TimeScatter');
-    const MaxTimeStart = document.getElementById('MaxTimeStart');
 
     if (ScatterGroup.value < 1 || ScatterGroup.value > 100 || isNaN(ScatterGroup.value)) {
         clearTimeout(timerWarn);
@@ -116,6 +115,10 @@ function cleanContainer(options) {
         if (scatterElemAmount >= elemArray.length) {
             scatterElemAmount = elemArray.length;
             clickCountPermission = false;
+
+            ScatterGroup.setAttribute('disabled', '');
+            MaxTimeStart.setAttribute('disabled', '');
+            MaxScatterLength.setAttribute('disabled', '');
             
             scatterButton.setAttribute('disabled', '');
             scatterButton.style.backgroundColor = '#ccc';
@@ -225,6 +228,10 @@ function cleanContainer(options) {
                 scatterElemAmount = 0;
                 scatterElemSum = 0;
                 maxTimeWait = 0;
+
+                ScatterGroup.removeAttribute('disabled');
+                MaxTimeStart.removeAttribute('disabled');
+                MaxScatterLength.removeAttribute('disabled');
                 
                 scatterButton.removeAttribute('disabled');
                 scatterButton.style.backgroundColor = '#fcff3b';
@@ -262,6 +269,10 @@ function initialContainer() {
     }
 
     shuffle(indexes);
+
+    ScatterGroup.removeAttribute('disabled');
+    MaxTimeStart.removeAttribute('disabled');
+    MaxScatterLength.removeAttribute('disabled');
 
     scatterButton.removeAttribute('disabled');
     scatterButton.style.backgroundColor = '#fcff3b';
