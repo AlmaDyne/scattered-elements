@@ -9,6 +9,7 @@ html, body {
     height: 100%;
     font-family: 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
     font-size: 11pt;
+    overflow: hidden;
 }
 
 h4, p {
@@ -29,6 +30,7 @@ h1, h4 {
     mix-blend-mode: darken;
     padding: 5px;
     text-align: center;
+    white-space: nowrap;
     color: #e7820e;
     border-bottom: 2px solid #71aaca;
 }
@@ -40,14 +42,13 @@ h1, h4 {
     display: flex;
     flex-direction: row;
     overflow-y: hidden;
-    overflow-x: overlay;
 }
 
 .FlexArea {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 26px 0;
+    padding: 18px 0;
 }
 
 .Flex1 {
