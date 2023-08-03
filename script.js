@@ -108,9 +108,14 @@ function cleanContainer(options) {
             }
         }
 
-        maxTimeWait = Math.max(maxTimeWait, ...sumTimesGroup, timeBlockFX);
+        const blockElemInGroup = (elemInGroup <= elemArray.length - scatterElemAmount) ?
+            elemInGroup - scatterElemCount :
+            elemArray.length - scatterElemAmount - scatterElemCount;
+
         scatterElemSum += scatterElemCount;
         scatterElemAmount += elemInGroup;
+
+        maxTimeWait = Math.max(maxTimeWait, ...sumTimesGroup, timeBlockFX);
 
         if (scatterElemAmount >= elemArray.length) {
             scatterElemAmount = elemArray.length;
@@ -127,14 +132,14 @@ function cleanContainer(options) {
             scatterButton.children[0].innerHTML = '<b>...Ожидание...</b>';
 
             if (scatterElemSum && scatterElemSum === scatterElemAmount) {
-                infoArea.innerHTML += `Выброшено элементов: ${scatterElemSum} (+${scatterElemCount}) (все)\n\n`;
-                infoArea.scrollTop = infoArea.scrollHeight;
+                infoArea.innerHTML += `Выброшено элементов: ${scatterElemSum} (+${scatterElemCount}) - Все.\n\n`;
             } else if (scatterElemSum && scatterElemSum !== scatterElemAmount) {
-                infoArea.innerHTML += `Выброшено элементов: ${scatterElemSum} (+${scatterElemCount}) (все разрешённые)\n\n`;
-                infoArea.scrollTop = infoArea.scrollHeight;
+                infoArea.innerHTML += `Выброшено элементов: ${scatterElemSum} (+${scatterElemCount})`;
+                if (blockElemInGroup) infoArea.innerHTML += ` (${blockElemInGroup} блок.)`;
+                infoArea.innerHTML += ` - Все разрешённые, кроме ${elemArray.length - scatterElemSum} блокиров.\n\n`;
             } else if (!scatterElemSum) {
-                infoArea.innerHTML += `Выброшено элементов: ${scatterElemSum} (+${scatterElemCount}) (все блокированы)\n\n`;
-                infoArea.scrollTop = infoArea.scrollHeight;
+                infoArea.innerHTML += `Выброшено элементов: ${scatterElemSum} (+${scatterElemCount})`;
+                infoArea.innerHTML += ` (${blockElemInGroup} блок.) - Все заблокированы.\n\n`;
             }
 
             new Promise(resolve => timerWait = setTimeout(resolve, maxTimeWait))
@@ -152,16 +157,21 @@ function cleanContainer(options) {
 
                     if (scatterElemSum === scatterElemAmount) {
                         infoArea.innerHTML += `Контейнер пуст.\n\n`;
-                        infoArea.scrollTop = infoArea.scrollHeight;
-                    } else {
+                    } else if (!scatterElemSum) {
                         infoArea.innerHTML += `Контейнер не имеет элементов, разрешённых для выброса.\n\n`;
-                        infoArea.scrollTop = infoArea.scrollHeight;
+                    } else {
+                        infoArea.innerHTML += `Контейнер больше не имеет элементов, разрешённых для выброса.\n\n`;
                     }
+                    
+                    infoArea.scrollTop = infoArea.scrollHeight;
                 });
         } else {
-            infoArea.innerHTML += `Выброшено элементов: ${scatterElemSum} (+${scatterElemCount}) \n`;
-            infoArea.scrollTop = infoArea.scrollHeight;
+            infoArea.innerHTML += `Выброшено элементов: ${scatterElemSum} (+${scatterElemCount})`;
+            if (blockElemInGroup) infoArea.innerHTML += ` (${blockElemInGroup} блок.)`;
+            infoArea.innerHTML += '\n';
         }
+
+        infoArea.scrollTop = infoArea.scrollHeight;
     } else if (scatterElemAmount === elemArray.length && fillContainerPermission) {
         fillContainerPermission = false;
         clickCountPermission = false;
@@ -174,12 +184,13 @@ function cleanContainer(options) {
 
         infoArea.innerHTML += 'Контейнер заполняется...\n\n';
         infoArea.scrollTop = infoArea.scrollHeight;
+        console.log('Порядок восстановления элементов:');
         
         let maxTimeRS = 0;
 
         for (let elem of elemArray) {
             let timeRS = orderedTimesRS.get(elem) || 0;
-                
+
             if (timeRS > maxTimeRS) maxTimeRS = timeRS;
         }
 
@@ -195,12 +206,12 @@ function cleanContainer(options) {
 
                     new Promise(res => timerWait = setTimeout(res, timeElemScatter))
                         .finally(() => {
-                            console.log((idx + 1) + ': ' + (timeElemScatter + orderedTimesRS.get(elem)));
-
                             elem.style.transition = timeElemHover + 'ms ease';
                             elem.removeAttribute('nohover');
                             elem.style.cursor = 'pointer';
                             resolve(elem);
+
+                            console.log((idx + 1) + ': ' + (timeElemScatter + orderedTimesRS.get(elem)) + 'мс');
                         });
                 }, orderedTimesRS.get(elem)); // Время задержки было запомнено во время выброса элемента
             } else {
@@ -209,8 +220,9 @@ function cleanContainer(options) {
                 
                 new Promise(res => timerWait = setTimeout(res, maxTimeRS + timeElemScatter))
                     .finally(() => {
-                        console.log((idx + 1) + ': ' + (maxTimeRS + timeElemScatter));
                         resolve(elem);
+
+                        console.log((idx + 1) + ': ' + (maxTimeRS + timeElemScatter) + 'мс');
                     });
             }
         })))
