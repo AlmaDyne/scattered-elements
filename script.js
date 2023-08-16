@@ -5,14 +5,16 @@ import { clickCount, shuffle, randomNumber, randomInteger } from "./function_sto
 const scatterButton = document.querySelector('.ClickingObject');
 const elemContainer = document.getElementById('ElementsContainer');
 const infoArea = document.querySelector('.TextInfo');
-const ScatterGroup = document.getElementById('ScatterGroup');
-const TimeScatter = document.getElementById('TimeScatter');
-const MaxTimeStart = document.getElementById('MaxTimeStart');
-const MaxScatterLength = document.getElementById('MaxScatterLength');
+const tableContSizes = document.querySelector('.Table-ContSizes');
+const initContSize = document.querySelector('input[name="ContainerSize"]:checked');
+const scatterGroup = document.getElementById('ScatterGroup');
+const timeScatter = document.getElementById('TimeScatter');
+const maxTimeStart = document.getElementById('MaxTimeStart');
+const maxScatterLength = document.getElementById('MaxScatterLength');
 let timerWarn = null,
     timerWait = null,
     indexes = [],
-    orderedTimesRS = new Map(),
+    orderedTimesRS = new Map(), // RS = Random Start
     iClick = 0,
     elemArray,
     scatterElemAmount,
@@ -23,29 +25,30 @@ let timerWarn = null,
     clickCountPermission;
 
 scatterButton.insertAdjacentHTML('beforeend', '<p id="ClickInfo">(Не нажато)</p>');
-    
-initialContainer();
 
-for (let radioButton of document.querySelectorAll('input[name="ContainerSize"]')) {
-    radioButton.addEventListener('click', () => initialContainer());
-}
+initialContainer(initContSize);
+
+// Делегирование события для таблицы выбора размеров контейнера
+tableContSizes.onclick = function(event) {
+    if (event.target.tagName == 'INPUT') initialContainer(event.target);
+};
 
 scatterButton.addEventListener('click', () => {
     if (clickCountPermission) clickCount(++iClick);
 
-    if (ScatterGroup.value < 1 || ScatterGroup.value > 100 || isNaN(ScatterGroup.value)) {
+    if (scatterGroup.value < 1 || scatterGroup.value > 100 || isNaN(scatterGroup.value)) {
         clearTimeout(timerWarn);
-        ScatterGroup.style.background = '#ff2c2c';
-        timerWarn = setTimeout(() => ScatterGroup.style.background = '', 500);
+        scatterGroup.style.background = '#ff2c2c';
+        timerWarn = setTimeout(() => scatterGroup.style.background = '', 500);
 
         infoArea.innerHTML += 'Неверно указано значение параметра!\n\n';
         infoArea.scrollTop = infoArea.scrollHeight;
     } else {
         cleanContainer({
-            elemInGroup: +ScatterGroup.value,
-            timeElemScatter: Math.round(TimeScatter.value ** 2 / 450),
-            maxTimeRS: +MaxTimeStart.value,
-            scatterLength: +MaxScatterLength.value
+            elemInGroup: +scatterGroup.value,
+            timeElemScatter: Math.round(timeScatter.value ** 2 / 450),
+            maxTimeRS: +maxTimeStart.value,
+            scatterLength: +maxScatterLength.value
         });
     }
 });
@@ -80,7 +83,7 @@ function cleanContainer(options) {
             const elem = elemArray[indexes[i] - 1];
 
             if (!elem.classList.contains('ElemBlocked')) {
-                elem.removeEventListener('click', elemClick);
+                elem.dataset.scattering = true;
 
                 if (fastElemIdx === null) fastElemIdx = i;
                 const timeRandomStart = (i === fastElemIdx) ? 0 : Math.ceil(Math.random() * maxTimeRS);
@@ -91,10 +94,11 @@ function cleanContainer(options) {
                         z = randomNumber(0.3, 2),
                         g = shuffle([-1, 1])[0] * 360;
                     
+                    
                     elem.setAttribute('nohover', '');
                     elem.style.cursor = 'default';
                     elem.style.transition = timeElemScatter + 'ms ease-in-out';
-                    elem.style.transform = `translate(${x}px, ${y}px) rotate(${g}deg) scale(${z})`;
+                    elem.style.transform = `translate(${x}px, ${y}px) /*rotate(${g}deg)*/ scale(${z})`;
                     elem.style.opacity = 0;
                     elem.style.visibility = "hidden";
                 }, timeRandomStart);
@@ -121,9 +125,9 @@ function cleanContainer(options) {
             scatterElemAmount = elemArray.length;
             clickCountPermission = false;
 
-            ScatterGroup.setAttribute('disabled', '');
-            MaxTimeStart.setAttribute('disabled', '');
-            MaxScatterLength.setAttribute('disabled', '');
+            scatterGroup.setAttribute('disabled', '');
+            maxTimeStart.setAttribute('disabled', '');
+            maxScatterLength.setAttribute('disabled', '');
             
             scatterButton.setAttribute('disabled', '');
             scatterButton.style.backgroundColor = '#ccc';
@@ -208,6 +212,7 @@ function cleanContainer(options) {
                         .finally(() => {
                             elem.style.transition = timeElemHover + 'ms ease';
                             elem.removeAttribute('nohover');
+                            elem.dataset.scattering = false;
                             elem.style.cursor = 'pointer';
                             resolve(elem);
 
@@ -228,7 +233,6 @@ function cleanContainer(options) {
         })))
             .then(elemArray => {
                 for (let elem of elemArray) {
-                    elem.addEventListener('click', elemClick);
                     elem.style.animationDuration = '';
                     elem.className = 'Element';
                 }
@@ -241,9 +245,9 @@ function cleanContainer(options) {
                 scatterElemSum = 0;
                 maxTimeWait = 0;
 
-                ScatterGroup.removeAttribute('disabled');
-                MaxTimeStart.removeAttribute('disabled');
-                MaxScatterLength.removeAttribute('disabled');
+                scatterGroup.removeAttribute('disabled');
+                maxTimeStart.removeAttribute('disabled');
+                maxScatterLength.removeAttribute('disabled');
                 
                 scatterButton.removeAttribute('disabled');
                 scatterButton.style.backgroundColor = '#fcff3b';
@@ -259,10 +263,10 @@ function cleanContainer(options) {
     }
 }
 
-function initialContainer() {
+function initialContainer(containerSize) {
     elemContainer.innerHTML = '';
 
-    const contSideElemAmount = +document.querySelector('input[name="ContainerSize"]:checked').value;
+    const contSideElemAmount = +containerSize.value;
     createContainer(contSideElemAmount);
 
     clearTimeout(timerWait);
@@ -275,16 +279,14 @@ function initialContainer() {
     maxTimeWait = 0;
     indexes.length = 0;
 
-    for (let i = 0; i < elemArray.length; i++) {
-        elemArray[i].addEventListener('click', elemClick);
-        indexes.push(i + 1);
-    }
-
+    for (let i = 1; i <= elemArray.length; i++) indexes.push(i);
     shuffle(indexes);
 
-    ScatterGroup.removeAttribute('disabled');
-    MaxTimeStart.removeAttribute('disabled');
-    MaxScatterLength.removeAttribute('disabled');
+    elemContainer.addEventListener('click', contClick);
+
+    scatterGroup.removeAttribute('disabled');
+    maxTimeStart.removeAttribute('disabled');
+    maxScatterLength.removeAttribute('disabled');
 
     scatterButton.removeAttribute('disabled');
     scatterButton.style.backgroundColor = '#fcff3b';
@@ -309,15 +311,16 @@ function createContainer(contSideElemAmount) {
     elemContainer.style.height = `${contSideSize}px`;
 
     for (let i = 1; i <= elemQuantity; i++) {
-        let divElement = document.createElement('div');
+        let elem = document.createElement('div');
 
-        divElement.className = 'Element';
-        divElement.style.width= `${ELEM_SIDE_SIZE}px`;
-        divElement.style.height = `${ELEM_SIDE_SIZE}px`;
-        divElement.style.lineHeight = `${ELEM_SIDE_SIZE}px`;
-        divElement.style.margin = `${elemDistance}px 0 0 ${elemDistance}px`;
-        divElement.innerHTML = `<spin>&#9678</spin>${i}+`;
-        elemContainer.append(divElement);
+        elem.className = 'Element';
+        elem.setAttribute('data-scattering', false);
+        elem.style.width= `${ELEM_SIDE_SIZE}px`;
+        elem.style.height = `${ELEM_SIDE_SIZE}px`;
+        elem.style.lineHeight = `${ELEM_SIDE_SIZE}px`;
+        elem.style.margin = `${elemDistance}px 0 0 ${elemDistance}px`;
+        elem.innerHTML = `<spin>&#9678</spin>${i}+`;
+        elemContainer.append(elem);
     }
 
     [].slice.call(document.querySelectorAll('.Element'))
@@ -326,6 +329,10 @@ function createContainer(contSideElemAmount) {
         .forEach(el => el.style.fontSize = `${Math.round(ELEM_SIDE_SIZE / 2.5)}pt`);
 }
 
-function elemClick() {
-    this.classList.add('ElemBlocked');
+// Делегирование события для блокирования элементов контейнера
+function contClick(event) {
+    let target = event.target.closest('.Element'); // Ближайший предок с классом "Element", включая себя
+
+    if (!target) return; // Если event.target не содержится внутри target, то завершить функцию
+    if (target.dataset.scattering == 'false') target.classList.add('ElemBlocked');
 }
