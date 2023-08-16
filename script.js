@@ -98,7 +98,7 @@ function cleanContainer(options) {
                     elem.setAttribute('nohover', '');
                     elem.style.cursor = 'default';
                     elem.style.transition = timeElemScatter + 'ms ease-in-out';
-                    elem.style.transform = `translate(${x}px, ${y}px) /*rotate(${g}deg)*/ scale(${z})`;
+                    elem.style.transform = `translate(${x}px, ${y}px) rotate(${g}deg) scale(${z})`;
                     elem.style.opacity = 0;
                     elem.style.visibility = "hidden";
                 }, timeRandomStart);
