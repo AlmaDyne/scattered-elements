@@ -78,8 +78,8 @@ function cleanContainer(options) {
         timeOnClick = Date.now();
 
         for (let i = scatterElemAmount; i < lastIdxInGroup; i++) {
-            // Если создать ссылку на элемент и заменить их на неё во всём цикле,
-            // то таймеры случайного старта автоматически удалятся при инициализации контейнера
+            // Если создать ссылку на элемент и заменить его на неё во всём цикле,
+            // то таймеры случайного старта не будут задействованы к новым элементам при инициализации контейнера
             const elem = elemArray[indexes[i] - 1];
 
             if (!elem.classList.contains('ElemBlocked')) {
@@ -95,7 +95,7 @@ function cleanContainer(options) {
                         g = shuffle([-1, 1])[0] * 360;
                     
                     
-                    elem.setAttribute('nohover', '');
+                    elem.setAttribute('data-no-hover', true);
                     elem.style.cursor = 'default';
                     elem.style.transition = timeElemScatter + 'ms ease-in-out';
                     elem.style.transform = `translate(${x}px, ${y}px) rotate(${g}deg) scale(${z})`;
@@ -107,6 +107,7 @@ function cleanContainer(options) {
                 sumTimesGroup.push(timeRandomStart + timeElemScatter);
                 scatterElemCount++;
             } else {
+                elem.setAttribute('data-block', 'fixed');
                 elem.classList.add('ElemBlockedFX');
                 timeBlockFX = parseFloat(getComputedStyle(elem).animationDuration) * 1000;
             }
@@ -148,8 +149,6 @@ function cleanContainer(options) {
 
             new Promise(resolve => timerWait = setTimeout(resolve, maxTimeWait))
                 .finally(() => {
-                    elemArray.forEach(elem => elem.classList.remove('ElemBlockedFX'));
-
                     fillContainerPermission = true;
                     clickCountPermission = true;
                     
@@ -166,7 +165,6 @@ function cleanContainer(options) {
                     } else {
                         infoArea.innerHTML += `Контейнер больше не имеет элементов, разрешённых для выброса.\n\n`;
                     }
-                    
                     infoArea.scrollTop = infoArea.scrollHeight;
                 });
         } else {
@@ -174,7 +172,6 @@ function cleanContainer(options) {
             if (blockElemInGroup) infoArea.innerHTML += ` (${blockElemInGroup} блок.)`;
             infoArea.innerHTML += '\n';
         }
-
         infoArea.scrollTop = infoArea.scrollHeight;
     } else if (scatterElemAmount === elemArray.length && fillContainerPermission) {
         fillContainerPermission = false;
@@ -188,13 +185,12 @@ function cleanContainer(options) {
 
         infoArea.innerHTML += 'Контейнер заполняется...\n\n';
         infoArea.scrollTop = infoArea.scrollHeight;
-        console.log('Порядок восстановления элементов:');
+        console.log('\nПорядок восстановления элементов:');
         
         let maxTimeRS = 0;
 
         for (let elem of elemArray) {
             let timeRS = orderedTimesRS.get(elem) || 0;
-
             if (timeRS > maxTimeRS) maxTimeRS = timeRS;
         }
 
@@ -211,11 +207,11 @@ function cleanContainer(options) {
                     new Promise(res => timerWait = setTimeout(res, timeElemScatter))
                         .finally(() => {
                             elem.style.transition = timeElemHover + 'ms ease';
-                            elem.removeAttribute('nohover');
+                            elem.removeAttribute('data-no-hover');
                             elem.dataset.scattering = false;
                             elem.style.cursor = 'pointer';
-                            resolve(elem);
 
+                            resolve(elem);
                             console.log((idx + 1) + ': ' + (timeElemScatter + orderedTimesRS.get(elem)) + 'мс');
                         });
                 }, orderedTimesRS.get(elem)); // Время задержки было запомнено во время выброса элемента
@@ -225,8 +221,9 @@ function cleanContainer(options) {
                 
                 new Promise(res => timerWait = setTimeout(res, maxTimeRS + timeElemScatter))
                     .finally(() => {
-                        resolve(elem);
+                        elem.removeAttribute('data-block');
 
+                        resolve(elem);
                         console.log((idx + 1) + ': ' + (maxTimeRS + timeElemScatter) + 'мс');
                     });
             }
@@ -311,7 +308,7 @@ function createContainer(contSideElemAmount) {
     elemContainer.style.height = `${contSideSize}px`;
 
     for (let i = 1; i <= elemQuantity; i++) {
-        let elem = document.createElement('div');
+        const elem = document.createElement('div');
 
         elem.className = 'Element';
         elem.setAttribute('data-scattering', false);
@@ -323,16 +320,24 @@ function createContainer(contSideElemAmount) {
         elemContainer.append(elem);
     }
 
-    [].slice.call(document.querySelectorAll('.Element'))
-        .forEach(el => el.style.fontSize = `${Math.round(ELEM_SIDE_SIZE / 6)}pt`);
+    elemContainer.style.fontSize = `${Math.round(ELEM_SIDE_SIZE / 6)}pt`;
     [].slice.call(document.querySelectorAll('.Element > spin'))
         .forEach(el => el.style.fontSize = `${Math.round(ELEM_SIDE_SIZE / 2.5)}pt`);
 }
 
 // Делегирование события для блокирования элементов контейнера
 function contClick(event) {
-    let target = event.target.closest('.Element'); // Ближайший предок с классом "Element", включая себя
+    const elem = event.target.closest('.Element'); // Ближайший предок с классом "Element", включая себя
+    
+    if (!elem) return; // Если event.target не является элементом с классом "Element" или его потомком
 
-    if (!target) return; // Если event.target не содержится внутри target, то завершить функцию
-    if (target.dataset.scattering == 'false') target.classList.add('ElemBlocked');
+    if (elem.dataset.scattering == 'false' && !elem.dataset.block) { // Если elem ещё не выбрасывался
+        elem.classList.toggle('ElemBlocked');
+        return;
+    };
+
+    if (elem.dataset.block == 'fixed') { // Если через блокированный элемент проходил цикл выброса
+        elem.classList.remove('ElemBlockedFX');
+        setTimeout(() => elem.classList.add('ElemBlockedFX'), 0);
+    }
 }

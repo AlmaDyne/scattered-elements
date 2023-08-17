@@ -127,6 +127,7 @@ h1, h4 {
     display: inline-block;
     background: #b0ff7b;
     text-align: center;
+    vertical-align: middle;
     border: 1px solid #0524d4;
     box-sizing: border-box;
     cursor: pointer;
@@ -136,7 +137,7 @@ h1, h4 {
     user-select: none;
 }
 
-.Element:not([nohover]):hover {
+.Element:not([data-no-hover]):hover {
     transform: translate(3px, 3px) !important;
 }
 
@@ -145,7 +146,7 @@ h1, h4 {
 }
 
 .ElemBlockedFX {
-    animation: BlockedElements 700ms ease-out;
+    animation: BlockedElements 700ms ease-out forwards;
 }
 
 .ElemRestoreFX {
@@ -153,15 +154,15 @@ h1, h4 {
 }
 
 @keyframes BlockedElements {
-    0% { border: 1px solid #ff0000; background: #ff7bc8; }
-    25% { border: 1px solid #ff0000; background: #fdff7b; }
-    100% { border: 1px solid #0524d4; background: #ff7bc8; }
+    0% { border: 1px solid #0524d4; background: #ff7bc8; }
+    25% { border: 1px solid #ff7b00; background: #fdff7b; }
+    100% { border: 1px solid #ff0000; background: #ff7bc8; }
 }
 
 @keyframes RestoreElements {
-    0% { border: 1px solid #0524d4; background: #ff7bc8; }
+    0% { border: 1px solid #ff0000; background: #ff7bc8; }
     10% { border: 1px solid #ff0000; background: #ffbb7b; }
-    40% { border: 1px solid #ff0000; background: #fdff7b; }
+    40% { border: 1px solid #ff7b00; background: #fdff7b; }
     100% { border: 1px solid #0524d4; background: #b0ff7b; }
 }
 
