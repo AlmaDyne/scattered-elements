@@ -1,8 +1,10 @@
 'use strict';
 
-import { clickCount, shuffle, randomNumber, randomInteger } from "./function_storage.js";
+import { clickCount, shuffle, randomNumber, randomInteger, sliderFunc } from "./function_storage.js";
 
 const scatterButton = document.querySelector('.ClickingObject');
+scatterButton.insertAdjacentHTML('beforeend', '<p id="ClickInfo">(Не нажато)</p>');
+const clickInfo = document.getElementById('ClickInfo');
 const elemContainer = document.getElementById('ElementsContainer');
 const infoArea = document.querySelector('.TextInfo');
 const tableContSizes = document.querySelector('.Table-ContSizes');
@@ -24,7 +26,9 @@ let timerWarn = null,
     fillContainerPermission,
     clickCountPermission;
 
-scatterButton.insertAdjacentHTML('beforeend', '<p id="ClickInfo">(Не нажато)</p>');
+sliderFunc(timeScatter, 200, 1800, 512, 1);
+sliderFunc(maxTimeStart, 0, 2000, 350, 1);
+sliderFunc(maxScatterLength, 0, 1000, 500, 1);
 
 initialContainer(initContSize);
 
@@ -34,7 +38,7 @@ tableContSizes.onclick = function(event) {
 };
 
 scatterButton.addEventListener('click', () => {
-    if (clickCountPermission) clickCount(++iClick);
+    if (clickCountPermission) clickCount(++iClick, clickInfo);
 
     if (scatterGroup.value < 1 || scatterGroup.value > 100 || isNaN(scatterGroup.value)) {
         clearTimeout(timerWarn);
@@ -46,9 +50,9 @@ scatterButton.addEventListener('click', () => {
     } else {
         cleanContainer({
             elemInGroup: +scatterGroup.value,
-            timeElemScatter: Math.round(timeScatter.value ** 2 / 450),
-            maxTimeRS: +maxTimeStart.value,
-            scatterLength: +maxScatterLength.value
+            timeElemScatter: +timeScatter.dataset.value,
+            maxTimeRS: +maxTimeStart.dataset.value,
+            scatterLength: +maxScatterLength.dataset.value
         });
     }
 });
@@ -127,8 +131,10 @@ function cleanContainer(options) {
             clickCountPermission = false;
 
             scatterGroup.setAttribute('disabled', '');
-            maxTimeStart.setAttribute('disabled', '');
-            maxScatterLength.setAttribute('disabled', '');
+            maxTimeStart.setAttribute('data-disabled', '');
+            changeSliderAvailability(maxTimeStart);
+            maxScatterLength.setAttribute('data-disabled', '');
+            changeSliderAvailability(maxScatterLength);
             
             scatterButton.setAttribute('disabled', '');
             scatterButton.style.backgroundColor = '#ccc';
@@ -243,8 +249,10 @@ function cleanContainer(options) {
                 maxTimeWait = 0;
 
                 scatterGroup.removeAttribute('disabled');
-                maxTimeStart.removeAttribute('disabled');
-                maxScatterLength.removeAttribute('disabled');
+                maxTimeStart.removeAttribute('data-disabled');
+                changeSliderAvailability(maxTimeStart);
+                maxScatterLength.removeAttribute('data-disabled');
+                changeSliderAvailability(maxScatterLength);
                 
                 scatterButton.removeAttribute('disabled');
                 scatterButton.style.backgroundColor = '#fcff3b';
@@ -282,8 +290,10 @@ function initialContainer(containerSize) {
     elemContainer.addEventListener('click', contClick);
 
     scatterGroup.removeAttribute('disabled');
-    maxTimeStart.removeAttribute('disabled');
-    maxScatterLength.removeAttribute('disabled');
+    maxTimeStart.removeAttribute('data-disabled');
+    changeSliderAvailability(maxTimeStart);
+    maxScatterLength.removeAttribute('data-disabled');
+    changeSliderAvailability(maxScatterLength);
 
     scatterButton.removeAttribute('disabled');
     scatterButton.style.backgroundColor = '#fcff3b';
@@ -339,5 +349,19 @@ function contClick(event) {
     if (elem.dataset.block == 'fixed') { // Если через блокированный элемент проходил цикл выброса
         elem.classList.remove('ElemBlockedFX');
         setTimeout(() => elem.classList.add('ElemBlockedFX'), 0);
+    }
+}
+
+function changeSliderAvailability(slider) {
+    let marker = slider.querySelector('.thumb');
+
+    if (slider.hasAttribute('data-disabled')) {
+        slider.style.backgroundColor = '#dddddd';
+        marker.style.backgroundColor = '#979797';
+        marker.style.cursor = 'default';
+    } else {
+        slider.style.backgroundColor = '';
+        marker.style.backgroundColor = '';
+        marker.style.cursor = 'pointer';
     }
 }

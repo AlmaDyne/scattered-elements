@@ -91,6 +91,7 @@ h1, h4 {
 .ContainerInfo {
     position: relative;
     z-index: 1;
+    user-select: none;
 }
 
 .ContainerInfo > .ExampleElement {
@@ -217,6 +218,7 @@ h1, h4 {
     height: 260px;
     vertical-align: middle;
     filter: invert(10%);
+    pointer-events: none;
 }
 
 .Table-ContSizes input[name="ContainerSize"], .Table-ContSizes label {
@@ -255,6 +257,37 @@ h1, h4 {
 .ParamListLine input[type="range"] {
     width: 100px;
     vertical-align: middle;
+}
+
+.ParamListLine .slider {
+    display: inline-block;
+    min-width: 108px;
+    height: 12px;
+    position: relative;
+    margin: 12px 6px;
+    border-radius: 4px;
+    background-color: #00f500;
+    text-align: center;
+    vertical-align: middle;
+    border: 1px solid #cfbbe0;
+    box-sizing: border-box;
+}
+.ParamListLine .slider > p {
+    margin-top: 12px;
+} 
+.slider > .thumb {
+    width: 8px;
+    height: 20px;
+    position: relative;
+    top: -5px;
+    background-color: #2c5cbd;
+    border-radius: 3px;
+    cursor: pointer;
+}
+.slider > .show-value {
+    color: #a14e00;
+    font-family: Calibri, 'Trebuchet MS', sans-serif;
+    font-size: 10pt;
 }
 
 .ContainerInfo::before, .Table-ContSizes::before, .ParametersList::before, .H4Background::before {
