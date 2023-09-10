@@ -47,22 +47,25 @@ function sliderFunc(sliderElem, minLimit, maxLimit, value, step, showValue = tru
     if (step < 0) step = 0;
 
     const marker = sliderElem.querySelector('.thumb');
-    const sliderRange = sliderElem.offsetWidth - marker.offsetWidth;
+    const sliderRange = sliderElem.clientWidth - marker.offsetWidth;
     const scaleRange = maxLimit - minLimit;
     const k = sliderRange / scaleRange; // Коэффициент преобразования новой шкалы от длины слайдера
+    const ratio = k * step;
     const minValue = minLimit;
     const maxValue = Math.floor(scaleRange / step) * step + minValue;
+    const SHOW_VALUE_TIME_DELAY = 200;
+    let valueOutput;
     let showValueTimer = null;
 
     value = Math.round((value - minValue) / step) * step + minValue;
     if (value < minLimit) value = minValue;
     if (value > maxLimit) value = maxValue;
 
-    sliderElem.setAttribute('data-minLimit', minLimit);
-    sliderElem.setAttribute('data-maxLimit', maxLimit);
+    sliderElem.setAttribute('data-min-limit', minLimit);
+    sliderElem.setAttribute('data-max-limit', maxLimit);
     sliderElem.setAttribute('data-value', value);
     sliderElem.setAttribute('data-step', step);
-    sliderElem.setAttribute('data-showValue', showValue);
+    sliderElem.setAttribute('data-show-value', showValue);
 
     let scaleX = (value - minValue) / step; // Номер деления на новой шкале для value
     let x = (k != Infinity) ? Math.round((value - minValue) * k) : 0; // Значение x относительно начального value
@@ -74,14 +77,13 @@ function sliderFunc(sliderElem, minLimit, maxLimit, value, step, showValue = tru
     //displayData();
 
     if (showValue) {
-        var valueOutput = document.createElement('span');
+        valueOutput = document.createElement('span');
         valueOutput.style.cssText = `
             position: absolute;
-            top: -20px;
         `;
-        valueOutput.className = 'show-value';
+        valueOutput.className = 'value-output';
         valueOutput.hidden = true;
-        marker.after(valueOutput);
+        marker.append(valueOutput);
     }
 
     sliderElem.ondragstart = false;
@@ -97,12 +99,13 @@ function sliderFunc(sliderElem, minLimit, maxLimit, value, step, showValue = tru
 
             valueOutput.hidden = false;
             valueOutput.innerHTML = sliderElem.dataset.value;
-            valueOutput.style.left = lastX + marker.offsetWidth / 2 - valueOutput.offsetWidth / 2 + 'px';
+            valueOutput.style.left = marker.offsetWidth / 2 - valueOutput.offsetWidth / 2 + 'px';
         }
 
         const shiftX = event.clientX - marker.getBoundingClientRect().left;
 
         document.documentElement.style.cursor = 'pointer';
+        marker.style.backgroundColor = '#00b7ff';
 
         document.addEventListener('pointermove', moveMarker);
         document.addEventListener('pointerup', releaseMarker);
@@ -134,7 +137,7 @@ function sliderFunc(sliderElem, minLimit, maxLimit, value, step, showValue = tru
                 sliderElem.setAttribute('data-value', value);
                 if (valueOutput) {
                     valueOutput.innerHTML = sliderElem.dataset.value;
-                    valueOutput.style.left = lastX + marker.offsetWidth / 2 - valueOutput.offsetWidth / 2 + 'px';
+                    valueOutput.style.left = marker.offsetWidth / 2 - valueOutput.offsetWidth / 2 + 'px';
                 }
 
                 changeColor();
@@ -144,11 +147,12 @@ function sliderFunc(sliderElem, minLimit, maxLimit, value, step, showValue = tru
 
         function releaseMarker() {
             document.documentElement.style.cursor = '';
-
-            if (valueOutput) showValueTimer = setTimeout(() => valueOutput.hidden = true, 250);
+            marker.style.backgroundColor = '';
 
             document.removeEventListener('pointermove', moveMarker);
             document.removeEventListener('pointerup', releaseMarker);
+
+            if (valueOutput) showValueTimer = setTimeout(() => valueOutput.hidden = true, SHOW_VALUE_TIME_DELAY);
         }
     }
 
@@ -173,12 +177,10 @@ function sliderFunc(sliderElem, minLimit, maxLimit, value, step, showValue = tru
         sliderElem.style.backgroundColor = `rgb(${colorRed}, ${colorGreen}, ${colorBlue})`;
     }
 
-    /*
-    function displayData() {
-        baseInfo.innerHTML = 'Ratio = ' + (k * step).toFixed(2);
-        baseInfo.innerHTML += '<br>x = ' + x;
-        baseInfo.innerHTML += '<br>ScaleX = ' + scaleX;
-        baseInfo.innerHTML += '<br>Value = ' + sliderElem.dataset.value;
-    }
-    */
+    /*function displayData() {
+        baseInfo.innerHTML = 'Ratio = ' + ratio.toFixed(2);
+        baseInfo.innerHTML += '<br>Marker | x = ' + x;
+        baseInfo.innerHTML += '<br>Marker | ScaleX = ' + scaleX;
+        baseInfo.innerHTML += '<br>Slider | Value = ' + sliderElem.dataset.value;
+    }*/
 }
