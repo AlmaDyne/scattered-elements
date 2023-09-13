@@ -1,6 +1,7 @@
 'use strict';
 
-import { clickCount, shuffle, randomNumber, randomInteger, sliderFunc } from "./function_storage.js";
+import { clickCount, shuffle, randomNumber, randomInteger } from "./function_storage.js";
+import { sliderBank } from "./slider_bank.js";
 
 const scatterButton = document.querySelector('.ClickingObject');
 scatterButton.insertAdjacentHTML('beforeend', '<p id="ClickInfo">(Не нажато)</p>');
@@ -26,9 +27,9 @@ let timerWarn = null,
     fillContainerPermission,
     clickCountPermission;
 
-sliderFunc(timeScatter, 200, 1800, 512, 1);
-sliderFunc(maxTimeStart, 0, 2000, 350, 1);
-sliderFunc(maxScatterLength, 0, 1000, 500, 1);
+sliderBank.activate(timeScatter, 1, 200, 1800, 512, 1);
+sliderBank.activate(maxTimeStart, 1, 0, 2000, 350, 1);
+sliderBank.activate(maxScatterLength, 1, 0, 1000, 500, 1);
 
 initialContainer(initContSize);
 
@@ -131,10 +132,7 @@ function cleanContainer(options) {
             clickCountPermission = false;
 
             scatterGroup.setAttribute('disabled', '');
-            maxTimeStart.setAttribute('data-disabled', '');
-            changeSliderAvailability(maxTimeStart);
-            maxScatterLength.setAttribute('data-disabled', '');
-            changeSliderAvailability(maxScatterLength);
+            sliderBank.disable(maxTimeStart, maxScatterLength);
             
             scatterButton.setAttribute('disabled', '');
             scatterButton.style.backgroundColor = '#ccc';
@@ -249,10 +247,7 @@ function cleanContainer(options) {
                 maxTimeWait = 0;
 
                 scatterGroup.removeAttribute('disabled');
-                maxTimeStart.removeAttribute('data-disabled');
-                changeSliderAvailability(maxTimeStart);
-                maxScatterLength.removeAttribute('data-disabled');
-                changeSliderAvailability(maxScatterLength);
+                sliderBank.enable(maxTimeStart, maxScatterLength);
                 
                 scatterButton.removeAttribute('disabled');
                 scatterButton.style.backgroundColor = '#fcff3b';
@@ -290,10 +285,7 @@ function initialContainer(containerSize) {
     elemContainer.addEventListener('click', contClick);
 
     scatterGroup.removeAttribute('disabled');
-    maxTimeStart.removeAttribute('data-disabled');
-    changeSliderAvailability(maxTimeStart);
-    maxScatterLength.removeAttribute('data-disabled');
-    changeSliderAvailability(maxScatterLength);
+    sliderBank.enable(maxTimeStart, maxScatterLength);
 
     scatterButton.removeAttribute('disabled');
     scatterButton.style.backgroundColor = '#fcff3b';
@@ -349,19 +341,5 @@ function contClick(event) {
     if (elem.dataset.block == 'fixed') { // Если через блокированный элемент проходил цикл выброса
         elem.classList.remove('ElemBlockedFX');
         setTimeout(() => elem.classList.add('ElemBlockedFX'), 0);
-    }
-}
-
-function changeSliderAvailability(slider) {
-    let marker = slider.querySelector('.thumb');
-
-    if (slider.hasAttribute('data-disabled')) {
-        slider.style.backgroundColor = '#dddddd';
-        marker.style.backgroundColor = '#979797';
-        marker.style.cursor = 'default';
-    } else {
-        slider.style.backgroundColor = '';
-        marker.style.backgroundColor = '';
-        marker.style.cursor = 'pointer';
     }
 }

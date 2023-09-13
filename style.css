@@ -93,7 +93,6 @@ h1, h4 {
     z-index: 1;
     user-select: none;
 }
-
 .ContainerInfo > .ExampleElement {
     display: inline-block;
     height: 20px;
@@ -101,16 +100,13 @@ h1, h4 {
     border: 1px solid #0524d4;
     box-sizing: border-box;
 }
-
 .ContainerInfo > .ExampleElement, .ContainerInfo > span {
     margin: 3px;
     vertical-align: middle;
 }
-
 .ContainerInfo .Allowed {
     background: #b0ff7b;
 }
-
 .ContainerInfo .Blocked {
     background: #ff7bc8;
 }
@@ -137,19 +133,15 @@ h1, h4 {
     opacity: 1;
     user-select: none;
 }
-
 .Element:not([data-no-hover]):hover {
     transform: translate(3px, 3px) !important;
 }
-
 .ElemBlocked {
     background: #ff7bc8;
 }
-
 .ElemBlockedFX {
     animation: BlockedElements 700ms ease-out forwards;
 }
-
 .ElemRestoreFX {
     animation: RestoreElements ease-in-out forwards;
 }
@@ -182,11 +174,9 @@ h1, h4 {
     box-sizing: border-box;
     border: 1px solid #71aaca;
 }
-
 .TextInfo:focus {
     outline: 0;
 }
-
 .TextInfo::selection {
     color: rgb(132, 247, 255);
     background: rgb(0, 13, 133);
@@ -201,26 +191,21 @@ h1, h4 {
     user-select: none;
     z-index: 1;
 }
-
 .Table-ContSizes td {
     padding: 5px;
 }
-
 .Table-ContSizes .Size {
     border-bottom: 1px solid #71aaca;
 }
-
 .Table-ContSizes .Description {
     cursor: default;
 }
-
 .Table-ContSizes .Description > img {
     height: 260px;
     vertical-align: middle;
     filter: invert(10%);
     pointer-events: none;
 }
-
 .Table-ContSizes input[name="ContainerSize"], .Table-ContSizes label {
     cursor: pointer;
 }
@@ -232,7 +217,6 @@ h1, h4 {
     list-style-type: none;
     z-index: 1;
 }
-
 .ParamListLine {
     display: flex;
     justify-content: flex-end;
@@ -241,19 +225,16 @@ h1, h4 {
     border-right: 1px solid #71aaca;
     border-bottom: 1px solid #71aaca;
 }
-
 .ParamListLine label {
     padding-right: 10px;
     vertical-align: middle;
     user-select: none;
 }
-
 .ParamListLine input[type="number"] {
     width: 40px;
     margin-right: 66px;
     padding: 2px;
 }
-
 .ParamListLine .slider {
     display: inline-block;
     min-width: 108px;
@@ -266,11 +247,8 @@ h1, h4 {
     vertical-align: middle;
     border: 1px solid #cfbbe0;
     box-sizing: border-box;
-}
-.ParamListLine .slider > p {
-    margin-top: 12px;
 } 
-.slider > .thumb {
+.ParamListLine .slider > .thumb {
     width: 8px;
     height: 20px;
     position: relative;
@@ -279,14 +257,18 @@ h1, h4 {
     border-radius: 3px;
     cursor: pointer;
 }
-.slider > .thumb > .value-output {
+.ParamListLine .slider > .thumb:hover {
+    background-color: #3873eb;
+}
+.ParamListLine .slider > .thumb > .value-output {
+    position: absolute;
     top: -15px;
     color: #a14e00;
     font-family: Calibri, 'Trebuchet MS', sans-serif;
     font-size: 10pt;
 }
 
-.ContainerInfo::before, .Table-ContSizes::before, .ParametersList::before, .H4Background::before {
+.ParametersList::before, .ContainerInfo::before, .Table-ContSizes::before, .H4Background::before {
     content: '';
     position: absolute;
     left: 0; right: 0; top: 0; bottom: 0;
@@ -310,17 +292,14 @@ h1, h4 {
     border-radius: 8px;
     user-select: none;
 }
-
 .ClickingObject:not([disabled]):active {
     background-color: #ffec44 !important;
 }
-
 .ClickingObject > p {
     padding: 2px;
     text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
     text-align: center;
 }
-
 #ClickInfo {
     font-size: 14pt;
     opacity: 0.5;
