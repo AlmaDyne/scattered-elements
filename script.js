@@ -46,7 +46,7 @@ scatterButton.addEventListener('click', () => {
         scatterGroup.style.background = '#ff2c2c';
         timerWarn = setTimeout(() => scatterGroup.style.background = '', 500);
 
-        infoArea.innerHTML += 'Неверно указано значение параметра!\n\n';
+        infoArea.value += 'Неверно указано значение параметра!\n\n';
         infoArea.scrollTop = infoArea.scrollHeight;
     } else {
         cleanContainer({
@@ -141,14 +141,14 @@ function cleanContainer(options) {
             scatterButton.children[0].innerHTML = '<b>...Ожидание...</b>';
 
             if (scatterElemSum && scatterElemSum === scatterElemAmount) {
-                infoArea.innerHTML += `Выброшено элементов: ${scatterElemSum} (+${scatterElemCount}) - Все.\n\n`;
+                infoArea.value += `Выброшено элементов: ${scatterElemSum} (+${scatterElemCount}) - Все.\n\n`;
             } else if (scatterElemSum && scatterElemSum !== scatterElemAmount) {
-                infoArea.innerHTML += `Выброшено элементов: ${scatterElemSum} (+${scatterElemCount})`;
-                if (blockElemInGroup) infoArea.innerHTML += ` (${blockElemInGroup} блок.)`;
-                infoArea.innerHTML += ` - Все разрешённые, кроме ${elemArray.length - scatterElemSum} блокиров.\n\n`;
+                infoArea.value += `Выброшено элементов: ${scatterElemSum} (+${scatterElemCount})`;
+                if (blockElemInGroup) infoArea.value += ` (${blockElemInGroup} блок.)`;
+                infoArea.value += ` - Все разрешённые, кроме ${elemArray.length - scatterElemSum} блокиров.\n\n`;
             } else if (!scatterElemSum) {
-                infoArea.innerHTML += `Выброшено элементов: ${scatterElemSum} (+${scatterElemCount})`;
-                infoArea.innerHTML += ` (${blockElemInGroup} блок.) - Все заблокированы.\n\n`;
+                infoArea.value += `Выброшено элементов: ${scatterElemSum} (+${scatterElemCount})`;
+                infoArea.value += ` (${blockElemInGroup} блок.) - Все заблокированы.\n\n`;
             }
 
             new Promise(resolve => timerWait = setTimeout(resolve, maxTimeWait))
@@ -163,18 +163,18 @@ function cleanContainer(options) {
                     scatterButton.children[0].innerHTML = '<b>Заполнить контейнер</b>';
 
                     if (scatterElemSum === scatterElemAmount) {
-                        infoArea.innerHTML += `Контейнер пуст.\n\n`;
+                        infoArea.value += `Контейнер пуст.\n\n`;
                     } else if (!scatterElemSum) {
-                        infoArea.innerHTML += `Контейнер не имеет элементов, разрешённых для выброса.\n\n`;
+                        infoArea.value += `Контейнер не имеет элементов, разрешённых для выброса.\n\n`;
                     } else {
-                        infoArea.innerHTML += `Контейнер больше не имеет элементов, разрешённых для выброса.\n\n`;
+                        infoArea.value += `Контейнер больше не имеет элементов, разрешённых для выброса.\n\n`;
                     }
                     infoArea.scrollTop = infoArea.scrollHeight;
                 });
         } else {
-            infoArea.innerHTML += `Выброшено элементов: ${scatterElemSum} (+${scatterElemCount})`;
-            if (blockElemInGroup) infoArea.innerHTML += ` (${blockElemInGroup} блок.)`;
-            infoArea.innerHTML += '\n';
+            infoArea.value += `Выброшено элементов: ${scatterElemSum} (+${scatterElemCount})`;
+            if (blockElemInGroup) infoArea.value += ` (${blockElemInGroup} блок.)`;
+            infoArea.value += '\n';
         }
         infoArea.scrollTop = infoArea.scrollHeight;
     } else if (scatterElemAmount === elemArray.length && fillContainerPermission) {
@@ -187,7 +187,7 @@ function cleanContainer(options) {
         scatterButton.style.cursor = 'not-allowed';
         scatterButton.children[0].innerHTML = '<b>...Ожидание...</b>';
 
-        infoArea.innerHTML += 'Контейнер заполняется...\n\n';
+        infoArea.value += 'Контейнер заполняется...\n\n';
         infoArea.scrollTop = infoArea.scrollHeight;
         console.log('\nПорядок восстановления элементов:');
         
@@ -255,7 +255,7 @@ function cleanContainer(options) {
                 scatterButton.style.cursor = 'pointer';
                 scatterButton.children[0].innerHTML = '<b>Разбросать элементы!</b>';
 
-                infoArea.innerHTML += 'Элементы в контейнере восстановлены.\n\n' +
+                infoArea.value += 'Элементы в контейнере восстановлены.\n\n' +
                     'Индексы элементов в порядке выбрасывания: \n' + indexes.join(', ') + '\n\n';
                 infoArea.scrollTop = infoArea.scrollHeight;
             })
@@ -293,7 +293,7 @@ function initialContainer(containerSize) {
     scatterButton.style.cursor = 'pointer';
     scatterButton.children[0].innerHTML = '<b>Разбросать элементы!</b>';
 
-    infoArea.innerHTML =
+    infoArea.value =
         'Элементы в контейнере (' + elemArray.length + '):\n' +
         elemArray.map(elem => elem.textContent).join(', ') + '\n\n' +
         'Индексы элементов в порядке выбрасывания:\n' + indexes.join(', ') + '\n\n';
