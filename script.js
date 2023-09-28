@@ -97,7 +97,7 @@ function cleanContainer(options) {
                     const x = randomInteger(-scatterLength, scatterLength),
                         y = randomInteger(-scatterLength, scatterLength),
                         z = randomNumber(0.3, 2),
-                        g = shuffle([-1, 1])[0] * 360;
+                        g = (Math.random() >= 0.5 ? 1 : -1) * 360;
                     
                     
                     elem.setAttribute('data-no-hover', true);
@@ -151,6 +151,12 @@ function cleanContainer(options) {
                 infoArea.value += ` (${blockElemInGroup} блок.) - Все заблокированы.\n\n`;
             }
 
+            // Выделение результата в текстовом оповещении
+            let selectPosStart = infoArea.value.lastIndexOf(' - ');
+            let selectPosEnd = infoArea.value.lastIndexOf('.');
+            infoArea.select();
+            infoArea.setSelectionRange(selectPosStart + 3, selectPosEnd, 'forward');
+
             new Promise(resolve => timerWait = setTimeout(resolve, maxTimeWait))
                 .finally(() => {
                     fillContainerPermission = true;
@@ -170,6 +176,10 @@ function cleanContainer(options) {
                         infoArea.value += `Контейнер больше не имеет элементов, разрешённых для выброса.\n\n`;
                     }
                     infoArea.scrollTop = infoArea.scrollHeight;
+
+                    // Ещё раз выделение результата в текстовом оповещении
+                    infoArea.select();
+                    infoArea.setSelectionRange(selectPosStart + 3, selectPosEnd, 'forward');
                 });
         } else {
             infoArea.value += `Выброшено элементов: ${scatterElemSum} (+${scatterElemCount})`;
@@ -191,7 +201,7 @@ function cleanContainer(options) {
         infoArea.scrollTop = infoArea.scrollHeight;
         console.log('\nПорядок восстановления элементов:');
         
-        let maxTimeRS = 0;
+        let maxTimeRS = 0; // RS = Random Start
 
         for (let elem of elemArray) {
             let timeRS = orderedTimesRS.get(elem) || 0;
